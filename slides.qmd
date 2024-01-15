@@ -1,0 +1,322 @@
+---
+title: "Shiny workshop"
+subtitle: "Natural History Museum"
+author: "Simon Smart"
+format: 
+  revealjs:
+    logo: images/uol_logo.png
+    chalkboard: 
+      src: chalkboard.json
+server: shiny
+date: "7 February 2024"
+preload-iframes: true
+---
+
+## About me
+
+```{css}
+code.sourceCode {
+  font-size: 0.8em;
+}
+
+.reveal .slide-logo {
+  height: 100px !important;
+  max-width: unset !important;
+  max-height: unset !important;
+}
+
+.shiny-input-container, .shiny-bound-output {
+box-sizing: border-box;
+color: rgb(51, 51, 51);
+font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 20px;
+margin-bottom: 15px;
+max-width: 100%;
+width: 300px
+}
+
+table {
+font-size: 30px
+}
+
+```
+
+-   Background in plant sciences and agricultural science
+-   Latecomer to R, only started in 2018
+-   Software developer in Population Health Sciences at University of Leicester
+-   Collaborating with Dave Redding on Disagapp for high resolution mapping of disease
+-   <https://github.com/simon-smart88>
+
+## Overview for this morning
+
+-   Introduction to Shiny
+-   How writing Shiny code differs from normal R
+-   Create example apps
+
+## Overview for the afternoon
+
+-   Deploying your app to the web
+-   
+
+## What is Shiny?
+
+-   R package developed by Posit/Rstudio, first released in 2012
+-   Framework for developing interactive web apps using R
+-   No need to learn any web development (html, css, javascript)
+-   If you can do something in R, you can publish it online using Shiny
+
+```{r}
+## {background-iframe="https://tomvision.shinyapps.io/tomvision/" background-interactive="true"}
+
+## {background-iframe="https://web.niab.com/pym-dashboard/?page=sign_in" background-interactive="true"}
+
+## {background-iframe="https://simonsmart.shinyapps.io/shinyscholar/" background-interactive="true"}
+```
+
+## Structure of a Shiny app
+
+Shiny apps consist of a user interface object and a server object
+
+```{r eval = FALSE, echo = TRUE}
+ui <- fluidPage()
+
+server <- function(input, output) {}
+
+shinyApp(ui = ui, server = server)
+```
+
+## Transfer between UI and server
+
+-   `input$` are where settings made in the UI are stored
+-   `output$` are where objects created in the server are stored
+
+## Reactivity basics
+
+## A simple example
+
+```{r eval = FALSE, echo = TRUE}
+ui <- fluidPage(textInput("name", "What is your name?"),
+                textOutput("name_out"))
+
+server <- function(input, output) {
+  output$name_out <- renderText(paste0("My name is ", input$name))
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+```{r}
+br()
+textInput("name", "What is your name?")
+textOutput("name_out")
+```
+
+```{r}
+#| context: server
+output$name_out <- renderText(paste0("My name is ",input$name))
+```
+
+## Another example
+
+```{r eval = FALSE, echo = TRUE}
+ui <- fluidPage(selectInput("animal", "Choose your favourite animal", 
+                            choices = c("","Whale", "Dinosaur")),
+                textOutput("animal_name"))
+
+server <- function(input, output) {
+  output$animal_name <- renderText({
+    animal_names = list("Whale" = "Hope", "Dinosaur" = "Dippy")
+    paste0("Your favourite animal's name is ",animal_names[[input$animal]])})
+}
+
+shinyApp(ui = ui, server = server)
+
+
+```
+
+```{r}
+br()
+selectInput("animal", "Choose your favourite animal", choices=c("", "Whale", "Dinosaur"))
+textOutput("animal_name")
+```
+
+```{r}
+#| context: server
+ output$animal_name <- renderText({
+    animal_names = list("Whale" = "Hope", "Dinosaur" = "Dippy")
+    paste0("Your favourite animal's name is ",animal_names[[input$animal]])
+    })
+```
+
+## Shiny input widgets
+
+::: columns
+::: {.column width="30%"}
+```{r eval = FALSE, echo = TRUE}
+actionButton()
+checkboxInput()
+dateInput()
+dateRangeInput()
+fileInput()
+numericInput()
+radioButtons()
+selectInput()
+sliderInput()
+textInput()
+```
+:::
+
+::: {.column width="70%"}
+![](images/basic-widgets.png){height="400px"}
+:::
+:::
+
+Source: <https://shiny.posit.co/r/getstarted/shiny-basics/lesson3/>
+
+##  {background-iframe="https://gallery.shinyapps.io/081-widgets-gallery/" background-interactive="true"}
+
+## Output functions
+
+Outputs are generated in the server using `render*` functions and displayed in the UI using `*Output` functions
+
+| Data type         | Render function     |     Output function |
+|-------------------|---------------------|--------------------:|
+| Table             | `renderTable()`     |     `tableOutput()` |
+| Plot              | `renderPlot()`      |      `plotOutput()` |
+| Text              | `renderText()`      |      `textOutput()` |
+| Image             | `renderImage()`     |     `imageOutput()` |
+| Interactive table | `renderDataTable()` | `dataTableOutput()` |
+
+## Curly bracket syntax
+
+-   Typically `render*()` functions are used with curly brackets `{}` inside the function
+-   This lets you write multiple lines of code, but only the last line is returned
+
+## UI development
+
+-   The UI object is one long list
+-   Objects need separating by `,`
+-   This can get very complicated!
+
+## Server development
+
+-   Shiny code is more complex to debug and errors may not be simple to understand
+-   It is often helpful to write code in an .Rmd file first and then refactor
+-   Start simple and build complexity gradually
+
+## Exercise 1
+
+Create an app where you:
+
+-   Load data from `iris`
+-   Filter the data in some way using `sliderInput()`, `numericInput()` or `selectInput()`
+-   Display the output using `renderTable()` and `tableOutput()`
+
+```{r}
+head(iris)
+unique(iris$Species)
+```
+
+## `reactive()`
+
+-   If you want to access an `input$` you must do so inside reactive objects
+-   You have already done this - all the `render*` function are reactive
+-   If you want to create an object without making an output though, you need to wrap it inside `reactive()`
+-   The resultant object is a function, so you need to append `()` when you access the values
+
+## `reactive()` example
+
+❌
+
+```{r echo=TRUE, eval=FALSE}
+df <- iris[iris$Species == input$species,]
+min_petal_length <- min(df$Petal.Length)
+```
+
+✅
+
+```{r echo=TRUE, eval=FALSE}
+df <- reactive(iris[iris$Species == input$species,])
+min_petal_length <- min(df()$Petal.Length)
+```
+
+## File uploads
+
+-   `fileInput()` uploads the file to the web server, but not into the R environment
+-   The resulting `input$` value contains a dataframe containing `name`, `size`, `type` and `datapath` columns
+-   To access the data, you need to process the file using the `datapath` column e.g.:
+
+```{r echo=TRUE, eval=FALSE}
+fileInput("file", "Upload file")
+
+df <- reactive({read.csv(input$file$datapath)})
+```
+
+## `renderUI()` and `uiOutput()`
+
+-   These can be used to generate UI elements containing values generated from other inputs
+-   UI:
+
+```{r echo=TRUE, eval=FALSE}
+numericInput("max_value", "Max value")
+uiOutput("my_widget")
+```
+
+-   Server:
+
+```{r echo=TRUE, eval=FALSE}
+output$my_widget <- renderUI({sliderInput("slider", "Value", min = 1, max = input$max_value)})
+slider_value <- reactive(input$slider)
+```
+
+## Exercise 2
+
+Create an app where you:
+
+-   Upload a spreadsheet - `fileInput()`
+-   Select the names of two columns - `renderUI()` and `selectInput()`
+-   Plot the two columns in a scatter plot - `renderPlot()`
+
+## Controlling reactivity
+
+-   Using `req()`
+-   Using `actionButton` and `observeEvent()`
+
+## Downloads
+
+## Leaflet
+
+## UI layouts
+
+## Templates
+
+## Common pitfalls
+
+-   Trying to use reactive objects in a non-reactive context
+-   Typos in `input` or `output` ids
+-   Using the same id twice
+-   Brackets and commas in UI
+
+## Debugging
+
+-   Run the code in a standard R script or .Rmd to check it works as you expect
+-   Use `verbatimTextOutput()` and `textOutput()` to display objects - are they in the state you expect?
+-   Include `options(shiny.fullstacktrace = TRUE)` in the server
+-   Add `browser()` above where your code is failing and then inspect the objects in your environment
+-   Create a simple app containing only the problematic elements (i.e. a minimal, reproducible example)
+
+## Deployment
+
+-   Publish your app so that others can use it
+-   We will use [shinyapps.io](https://shinyapps.io)
+-   Free and easy to use but has limitations:
+    -   Only 1GB RAM on free tiers which may not be enough to run models
+    -   No persistent data storage
+-   Many other options available
+
+## Create an account
+
+-   Register
+
+## Basics on what shinyapps does
