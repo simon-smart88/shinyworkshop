@@ -465,6 +465,15 @@ width: 300px
 <li><a href="https://github.com/simon-smart88" class="uri">https://github.com/simon-smart88</a></li>
 </ul>
 </section>
+<section id="workshop-overview" class="slide level2">
+<h2>Workshop overview</h2>
+<ul>
+<li>Trying to be broad but shallow so you know what’s possible, rather than narrow but exhaustive</li>
+<li>Please interrupt: If you’re not sure then someone else isn’t</li>
+<li>Aiming for 50:50 me talking:you writing</li>
+<li>Code examples are not always complete i.e.&nbsp;not all required arguments are used</li>
+</ul>
+</section>
 <section id="overview-for-this-morning" class="slide level2">
 <h2>Overview for this morning</h2>
 <ul>
@@ -476,8 +485,10 @@ width: 300px
 <section id="overview-for-the-afternoon" class="slide level2">
 <h2>Overview for the afternoon</h2>
 <ul>
+<li>User interface design</li>
+<li>Interactive maps</li>
 <li>Deploying your app to the web</li>
-<li></li>
+<li>Common problems and debugging</li>
 </ul>
 </section>
 <section id="what-is-shiny" class="slide level2">
@@ -491,27 +502,64 @@ width: 300px
 </section>
 <section id="download-materials" class="slide level2">
 <h2>Download materials</h2>
+<ul>
+<li><code>git clone https://github.com/simon-smart88/shinyworkshop</code></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">download.file</span>(<span class="at">url =</span> <span class="st">"t.ly/Y6ZDH"</span>, <span class="at">destfile =</span> <span class="st">"shinyworkshop.zip"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="structure-of-a-shiny-app" class="slide level2">
 <h2>Structure of a Shiny app</h2>
 <p>Shiny apps consist of a user interface object (UI) and a server object</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>()</span>
-<span id="cb1-2"><a href="#cb1-2"></a></span>
-<span id="cb1-3"><a href="#cb1-3"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output) {}</span>
-<span id="cb1-4"><a href="#cb1-4"></a></span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>()</span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output) {}</span>
+<span id="cb2-4"><a href="#cb2-4"></a></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="transfer-between-the-ui-and-server" class="slide level2">
 <h2>Transfer between the UI and server</h2>
 <ul>
-<li>The server function takes two lists as arguments:
+<li>The server function takes two <code>list()</code>-like objects as arguments:
 <ul>
-<li><code>input$</code> where settings made in the UI are stored</li>
-<li><code>output$</code> where objects created in the server that need to be displayed in the UI are stored</li>
+<li><code>input$</code> where settings made in the UI are stored
+<ul>
+<li>Created for you by objects in the UI</li>
+<li>Values are read-only</li>
+</ul></li>
+<li><code>output$</code> where objects created in the server that need to be displayed in the UI are stored
+<ul>
+<li>You declare them yourself</li>
+</ul></li>
 </ul></li>
 </ul>
+</section>
+<section id="input-and-output-ids" class="slide level2">
+<h2>Input and output IDs</h2>
+<ul>
+<li>The objects in <code>input$</code> and <code>output$</code> have an ID used to refer to them</li>
+<li>These must be unique or you will get errors</li>
+<li>For <code>input$</code> objects, the ID is always the first argument of the function used to create them:</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">textInput</span>(<span class="st">"my_first_input"</span>) </span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="co">#allows you to use this in server:</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>input<span class="sc">$</span>my_first_input</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="input-and-output-ids-1" class="slide level2">
+<h2>Input and output IDs</h2>
+<ul>
+<li>For <code>output$</code> objects, you declare them and then reference them by ID in the UI:</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>output<span class="sc">$</span>my_first_output <span class="ot">&lt;-</span> <span class="fu">renderText</span>(<span class="st">"Hello world"</span>) </span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="co">#allows you to use this in UI:</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="fu">textOutput</span>(<span class="st">"my_first_output"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="reactivity-basics" class="slide level2">
 <h2>Reactivity basics</h2>
@@ -521,7 +569,7 @@ width: 300px
 <li>Code in the server function is <em>reactive</em></li>
 <li>If an input value changes, then any code which uses the input is rerun</li>
 <li>Similarly, any code which uses a value calculated from the input is also rerun</li>
-<li>Unlike in a normal R script, code isn’t necessarily executed from top to bottom</li>
+<li>Unlike in a normal R script, code isn’t executed from top to bottom</li>
 </ul>
 </div><div class="column" style="width:30%;">
 <div class="cell" data-reveal="true" data-fig-width="6">
@@ -548,14 +596,14 @@ class C sout
 <div class="columns">
 <div class="column" style="width:80%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(<span class="fu">textInput</span>(<span class="st">"name"</span>, <span class="st">"What is your name?"</span>),</span>
-<span id="cb2-2"><a href="#cb2-2"></a>                <span class="fu">textOutput</span>(<span class="st">"name_out"</span>))</span>
-<span id="cb2-3"><a href="#cb2-3"></a></span>
-<span id="cb2-4"><a href="#cb2-4"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output) {</span>
-<span id="cb2-5"><a href="#cb2-5"></a>  output<span class="sc">$</span>name_out <span class="ot">&lt;-</span> <span class="fu">renderText</span>(<span class="fu">paste0</span>(<span class="st">"My name is "</span>, input<span class="sc">$</span>name))</span>
-<span id="cb2-6"><a href="#cb2-6"></a>}</span>
-<span id="cb2-7"><a href="#cb2-7"></a></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(<span class="fu">textInput</span>(<span class="st">"name"</span>, <span class="st">"What is your name?"</span>),</span>
+<span id="cb5-2"><a href="#cb5-2"></a>                <span class="fu">textOutput</span>(<span class="st">"name_out"</span>))</span>
+<span id="cb5-3"><a href="#cb5-3"></a></span>
+<span id="cb5-4"><a href="#cb5-4"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output) {</span>
+<span id="cb5-5"><a href="#cb5-5"></a>  output<span class="sc">$</span>name_out <span class="ot">&lt;-</span> <span class="fu">renderText</span>(<span class="fu">paste0</span>(<span class="st">"My name is "</span>, input<span class="sc">$</span>name))</span>
+<span id="cb5-6"><a href="#cb5-6"></a>}</span>
+<span id="cb5-7"><a href="#cb5-7"></a></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="cell-output-display">
@@ -595,17 +643,17 @@ class C sout
 <section id="another-example" class="slide level2">
 <h2>Another example</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(<span class="fu">selectInput</span>(<span class="st">"animal"</span>, <span class="st">"Choose your favourite animal"</span>, </span>
-<span id="cb3-2"><a href="#cb3-2"></a>                            <span class="at">choices =</span> <span class="fu">c</span>(<span class="st">""</span>,<span class="st">"Whale"</span>, <span class="st">"Dinosaur"</span>)),</span>
-<span id="cb3-3"><a href="#cb3-3"></a>                <span class="fu">textOutput</span>(<span class="st">"animal_name"</span>))</span>
-<span id="cb3-4"><a href="#cb3-4"></a></span>
-<span id="cb3-5"><a href="#cb3-5"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output) {</span>
-<span id="cb3-6"><a href="#cb3-6"></a>  output<span class="sc">$</span>animal_name <span class="ot">&lt;-</span> <span class="fu">renderText</span>({</span>
-<span id="cb3-7"><a href="#cb3-7"></a>    animal_names <span class="ot">=</span> <span class="fu">list</span>(<span class="st">"Whale"</span> <span class="ot">=</span> <span class="st">"Hope"</span>, <span class="st">"Dinosaur"</span> <span class="ot">=</span> <span class="st">"Dippy"</span>)</span>
-<span id="cb3-8"><a href="#cb3-8"></a>    <span class="fu">paste0</span>(<span class="st">"Your favourite animal's name is "</span>,animal_names[[input<span class="sc">$</span>animal]])})</span>
-<span id="cb3-9"><a href="#cb3-9"></a>}</span>
-<span id="cb3-10"><a href="#cb3-10"></a></span>
-<span id="cb3-11"><a href="#cb3-11"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(<span class="fu">selectInput</span>(<span class="st">"animal"</span>, <span class="st">"Choose your favourite animal"</span>, </span>
+<span id="cb6-2"><a href="#cb6-2"></a>                            <span class="at">choices =</span> <span class="fu">c</span>(<span class="st">""</span>,<span class="st">"Whale"</span>, <span class="st">"Dinosaur"</span>)),</span>
+<span id="cb6-3"><a href="#cb6-3"></a>                <span class="fu">textOutput</span>(<span class="st">"animal_name"</span>))</span>
+<span id="cb6-4"><a href="#cb6-4"></a></span>
+<span id="cb6-5"><a href="#cb6-5"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output) {</span>
+<span id="cb6-6"><a href="#cb6-6"></a>  output<span class="sc">$</span>animal_name <span class="ot">&lt;-</span> <span class="fu">renderText</span>({</span>
+<span id="cb6-7"><a href="#cb6-7"></a>    animal_names <span class="ot">=</span> <span class="fu">list</span>(<span class="st">"Whale"</span> <span class="ot">=</span> <span class="st">"Hope"</span>, <span class="st">"Dinosaur"</span> <span class="ot">=</span> <span class="st">"Dippy"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8"></a>    <span class="fu">paste0</span>(<span class="st">"Your favourite animal's name is "</span>,animal_names[[input<span class="sc">$</span>animal]])})</span>
+<span id="cb6-9"><a href="#cb6-9"></a>}</span>
+<span id="cb6-10"><a href="#cb6-10"></a></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="columns">
 <div class="column" style="width:30%;">
@@ -643,19 +691,43 @@ class C sout
 <section id="static-code-can-be-put-in-different-places" class="slide level2">
 <h2>Static code can be put in different places</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>()</span>
-<span id="cb4-2"><a href="#cb4-2"></a></span>
-<span id="cb4-3"><a href="#cb4-3"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>()</span>
-<span id="cb4-4"><a href="#cb4-4"></a></span>
-<span id="cb4-5"><a href="#cb4-5"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output) {</span>
-<span id="cb4-6"><a href="#cb4-6"></a>  </span>
-<span id="cb4-7"><a href="#cb4-7"></a>  df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>()</span>
-<span id="cb4-8"><a href="#cb4-8"></a>  </span>
-<span id="cb4-9"><a href="#cb4-9"></a>  output<span class="sc">$</span>output <span class="ot">&lt;-</span> <span class="fu">renderTable</span>({</span>
-<span id="cb4-10"><a href="#cb4-10"></a>    df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>()</span>
-<span id="cb4-11"><a href="#cb4-11"></a>}</span>
-<span id="cb4-12"><a href="#cb4-12"></a></span>
-<span id="cb4-13"><a href="#cb4-13"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>()</span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>()</span>
+<span id="cb7-4"><a href="#cb7-4"></a></span>
+<span id="cb7-5"><a href="#cb7-5"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output) {</span>
+<span id="cb7-6"><a href="#cb7-6"></a>  </span>
+<span id="cb7-7"><a href="#cb7-7"></a>  df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>()</span>
+<span id="cb7-8"><a href="#cb7-8"></a>  </span>
+<span id="cb7-9"><a href="#cb7-9"></a>  output<span class="sc">$</span>output <span class="ot">&lt;-</span> <span class="fu">renderTable</span>({</span>
+<span id="cb7-10"><a href="#cb7-10"></a>    df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>()</span>
+<span id="cb7-11"><a href="#cb7-11"></a>  })</span>
+<span id="cb7-12"><a href="#cb7-12"></a>}  </span>
+<span id="cb7-13"><a href="#cb7-13"></a></span>
+<span id="cb7-14"><a href="#cb7-14"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="static-code-can-be-put-in-different-places-1" class="slide level2">
+<h2>Static code can be put in different places</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>()</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="co"># run once when the app starts</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a></span>
+<span id="cb8-4"><a href="#cb8-4"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>()</span>
+<span id="cb8-5"><a href="#cb8-5"></a></span>
+<span id="cb8-6"><a href="#cb8-6"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output) {</span>
+<span id="cb8-7"><a href="#cb8-7"></a>  </span>
+<span id="cb8-8"><a href="#cb8-8"></a>  df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>()</span>
+<span id="cb8-9"><a href="#cb8-9"></a>  <span class="co"># run whenever a new user uses the app</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a>  </span>
+<span id="cb8-11"><a href="#cb8-11"></a>  output<span class="sc">$</span>output <span class="ot">&lt;-</span> <span class="fu">renderTable</span>({</span>
+<span id="cb8-12"><a href="#cb8-12"></a>    df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>()</span>
+<span id="cb8-13"><a href="#cb8-13"></a>    <span class="co"># run whenever input$value changes</span></span>
+<span id="cb8-14"><a href="#cb8-14"></a>    df <span class="ot">&lt;-</span> df[df<span class="sc">$</span>column <span class="sc">==</span> input<span class="sc">$</span>value,]</span>
+<span id="cb8-15"><a href="#cb8-15"></a>  })</span>
+<span id="cb8-16"><a href="#cb8-16"></a>}  </span>
+<span id="cb8-17"><a href="#cb8-17"></a></span>
+<span id="cb8-18"><a href="#cb8-18"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="shiny-input-widgets" class="slide level2">
@@ -663,16 +735,16 @@ class C sout
 <div class="columns">
 <div class="column" style="width:30%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">actionButton</span>()</span>
-<span id="cb5-2"><a href="#cb5-2"></a><span class="fu">checkboxInput</span>()</span>
-<span id="cb5-3"><a href="#cb5-3"></a><span class="fu">dateInput</span>()</span>
-<span id="cb5-4"><a href="#cb5-4"></a><span class="fu">dateRangeInput</span>()</span>
-<span id="cb5-5"><a href="#cb5-5"></a><span class="fu">fileInput</span>()</span>
-<span id="cb5-6"><a href="#cb5-6"></a><span class="fu">numericInput</span>()</span>
-<span id="cb5-7"><a href="#cb5-7"></a><span class="fu">radioButtons</span>()</span>
-<span id="cb5-8"><a href="#cb5-8"></a><span class="fu">selectInput</span>()</span>
-<span id="cb5-9"><a href="#cb5-9"></a><span class="fu">sliderInput</span>()</span>
-<span id="cb5-10"><a href="#cb5-10"></a><span class="fu">textInput</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">actionButton</span>()</span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="fu">checkboxInput</span>()</span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="fu">dateInput</span>()</span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="fu">dateRangeInput</span>()</span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="fu">fileInput</span>()</span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="fu">numericInput</span>()</span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="fu">radioButtons</span>()</span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="fu">selectInput</span>()</span>
+<span id="cb9-9"><a href="#cb9-9"></a><span class="fu">sliderInput</span>()</span>
+<span id="cb9-10"><a href="#cb9-10"></a><span class="fu">textInput</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div><div class="column" style="width:70%;">
 <p><img data-src="images/basic-widgets.png" height="400"></p>
@@ -742,9 +814,10 @@ class C sout
 <h2>Server development</h2>
 <ul>
 <li>Shiny code is more complex to debug and errors may not be simple to understand</li>
-<li>It is often helpful to write code in an .Rmd file first and then refactor</li>
+<li>Some mistakes won’t produce any errors at all</li>
+<li>It is often helpful to write code in an .Rmd file first and then refactor for reactivity</li>
 <li>Start simple and build complexity gradually</li>
-<li>If you don’t already, use the F1 key to look up documentation</li>
+<li>If you don’t already, use the F1 key to look at documentation</li>
 </ul>
 </section>
 <section id="exercise-1" class="slide level2">
@@ -784,13 +857,13 @@ Levels: setosa versicolor virginica</code></pre>
 <h2><code>reactive()</code> example</h2>
 <p>❌</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>df <span class="ot">&lt;-</span> iris[iris<span class="sc">$</span>Species <span class="sc">==</span> input<span class="sc">$</span>species,]</span>
-<span id="cb8-2"><a href="#cb8-2"></a>min_petal_length <span class="ot">&lt;-</span> <span class="fu">min</span>(df<span class="sc">$</span>Petal.Length)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>df <span class="ot">&lt;-</span> iris[iris<span class="sc">$</span>Species <span class="sc">==</span> input<span class="sc">$</span>species,]</span>
+<span id="cb12-2"><a href="#cb12-2"></a>min_petal_length <span class="ot">&lt;-</span> <span class="fu">min</span>(df<span class="sc">$</span>Petal.Length)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>✅</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>df <span class="ot">&lt;-</span> <span class="fu">reactive</span>(iris[iris<span class="sc">$</span>Species <span class="sc">==</span> input<span class="sc">$</span>species,])</span>
-<span id="cb9-2"><a href="#cb9-2"></a>min_petal_length <span class="ot">&lt;-</span> <span class="fu">min</span>(<span class="fu">df</span>()<span class="sc">$</span>Petal.Length)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>df <span class="ot">&lt;-</span> <span class="fu">reactive</span>(iris[iris<span class="sc">$</span>Species <span class="sc">==</span> input<span class="sc">$</span>species,])</span>
+<span id="cb13-2"><a href="#cb13-2"></a>min_petal_length <span class="ot">&lt;-</span> <span class="fu">min</span>(<span class="fu">df</span>()<span class="sc">$</span>Petal.Length)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="file-uploads" class="slide level2">
@@ -801,31 +874,42 @@ Levels: setosa versicolor virginica</code></pre>
 <li>To access the data, you need to process the file using the <code>datapath</code> column e.g.:</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">fileInput</span>(<span class="st">"file"</span>, <span class="st">"Upload file"</span>)</span>
-<span id="cb10-2"><a href="#cb10-2"></a>df <span class="ot">&lt;-</span> <span class="fu">reactive</span>({<span class="fu">read.csv</span>(input<span class="sc">$</span>file<span class="sc">$</span>datapath)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">fileInput</span>(<span class="st">"file"</span>, <span class="st">"Upload file"</span>)</span>
+<span id="cb14-2"><a href="#cb14-2"></a>df <span class="ot">&lt;-</span> <span class="fu">reactive</span>(<span class="fu">read.csv</span>(input<span class="sc">$</span>file<span class="sc">$</span>datapath))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="renderui-and-uioutput" class="slide level2">
 <h2><code>renderUI()</code> and <code>uiOutput()</code></h2>
 <ul>
-<li>These functions can be used to generate UI elements containing values generated from other inputs</li>
-<li>UI:</li>
+<li>These functions can be used to generate UI elements containing values reliant on other inputs</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">numericInput</span>(<span class="st">"max_value"</span>, <span class="st">"Max value"</span>)</span>
-<span id="cb11-2"><a href="#cb11-2"></a><span class="fu">uiOutput</span>(<span class="st">"my_widget"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co">#UI:</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="fu">numericInput</span>(<span class="st">"max_value"</span>, <span class="st">"Max value"</span>, <span class="at">value =</span> <span class="dv">10</span>)</span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="fu">uiOutput</span>(<span class="st">"my_widget"</span>)</span>
+<span id="cb15-4"><a href="#cb15-4"></a><span class="fu">textOutput</span>(<span class="st">"slider_value"</span>)</span>
+<span id="cb15-5"><a href="#cb15-5"></a><span class="co">#Server:</span></span>
+<span id="cb15-6"><a href="#cb15-6"></a>output<span class="sc">$</span>my_widget <span class="ot">&lt;-</span> <span class="fu">renderUI</span>({</span>
+<span id="cb15-7"><a href="#cb15-7"></a>  <span class="fu">sliderInput</span>(<span class="st">"slider"</span>, <span class="st">"Value"</span>, <span class="at">value =</span> <span class="dv">5</span>, <span class="at">min =</span> <span class="dv">1</span>, <span class="at">max =</span> input<span class="sc">$</span>max_value)</span>
+<span id="cb15-8"><a href="#cb15-8"></a>  })</span>
+<span id="cb15-9"><a href="#cb15-9"></a>output<span class="sc">$</span>slider_value <span class="ot">&lt;-</span> <span class="fu">renderText</span>(input<span class="sc">$</span>slider)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<style type="text/css">
-
-</style>
+<div class="cell-output-display">
+<br>
 </div>
-<ul>
-<li>Server:</li>
-</ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>output<span class="sc">$</span>my_widget <span class="ot">&lt;-</span> <span class="fu">renderUI</span>({<span class="fu">sliderInput</span>(<span class="st">"slider"</span>, <span class="st">"Value"</span>, <span class="at">min =</span> <span class="dv">1</span>, <span class="at">max =</span> input<span class="sc">$</span>max_value)})</span>
-<span id="cb12-2"><a href="#cb12-2"></a>slider_value <span class="ot">&lt;-</span> <span class="fu">reactive</span>(input<span class="sc">$</span>slider)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="form-group shiny-input-container">
+<label class="control-label" id="max_value-label" for="max_value">Max value</label>
+<input id="max_value" type="number" class="shiny-input-number form-control" value="10">
+</div>
+</div>
+<div class="cell-output-display">
+<div id="my_widget" class="shiny-html-output"></div>
+</div>
+<div class="cell-output-display">
+<div id="slider_value" class="shiny-text-output"></div>
+</div>
 </div>
 </section>
 <section id="controlling-reactivity" class="slide level2">
@@ -842,13 +926,13 @@ Levels: setosa versicolor virginica</code></pre>
 <h2>Using <code>req()</code></h2>
 <ul>
 <li><code>req()</code> is used to control execution of a function by defining the values that it <em>requires</em></li>
-<li>Placed at the top of reactive functions</li>
+<li>Placed at the top of reactive functions i.e.&nbsp;<code>reactive()</code> and <code>render*()</code></li>
 <li>If the conditions are not met, execution is halted</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="fu">req</span>(input<span class="sc">$</span>file) <span class="co">#checks that the input is not NULL</span></span>
-<span id="cb13-2"><a href="#cb13-2"></a><span class="fu">req</span>(input<span class="sc">$</span>name <span class="sc">==</span> <span class="st">"Simon"</span>) <span class="co">#checks a specific condition </span></span>
-<span id="cb13-3"><a href="#cb13-3"></a><span class="fu">req</span>(input<span class="sc">$</span>file, some_setting <span class="sc">==</span> <span class="st">"correct"</span>) <span class="co">#checks both conditions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="fu">req</span>(input<span class="sc">$</span>file) <span class="co">#checks that the input is not NULL</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="fu">req</span>(input<span class="sc">$</span>name <span class="sc">==</span> <span class="st">"Simon"</span>) <span class="co">#checks a specific condition </span></span>
+<span id="cb16-3"><a href="#cb16-3"></a><span class="fu">req</span>(input<span class="sc">$</span>file, some_setting <span class="sc">==</span> <span class="st">"correct"</span>) <span class="co">#checks both conditions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="using-validate" class="slide level2">
@@ -859,17 +943,33 @@ Levels: setosa versicolor virginica</code></pre>
 </section>
 <section id="using-actionbutton-and-observeevent" class="slide level2">
 <h2>Using <code>actionButton</code> and <code>observeEvent()</code></h2>
+<p>UI:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">actionButton</span>(<span class="st">"go"</span>, <span class="st">"Go!"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Server:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">observeEvent</span>(input<span class="sc">$</span>go, {</span>
+<span id="cb18-2"><a href="#cb18-2"></a>    <span class="co">#do stuff  </span></span>
+<span id="cb18-3"><a href="#cb18-3"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>UI:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="fu">actionButton</span>(<span class="st">"go"</span>, <span class="st">"Go!"</span>)</span>
+<span id="cb19-2"><a href="#cb19-2"></a><span class="fu">textOutput</span>(<span class="st">"pressed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Server:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="fu">observeEvent</span>(input<span class="sc">$</span>go, {</span>
+<span id="cb20-2"><a href="#cb20-2"></a>      </span>
+<span id="cb20-3"><a href="#cb20-3"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="exercise-2" class="slide level2">
 <h2>Exercise 2</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p>Create an app where you:</p>
-<ul>
-<li>Upload a spreadsheet - <code>fileInput()</code></li>
-<li>Select the names of two columns - <code>renderUI()</code> and <code>selectInput()</code></li>
-<li>Plot the two columns in a scatter plot - <code>renderPlot()</code></li>
-</ul>
+<p>Create an app where you: - Upload a spreadsheet - <code>fileInput()</code> - Select the names of two columns - <code>renderUI()</code> and <code>selectInput()</code> - Plot the two columns in a scatter plot - <code>renderPlot()</code> - Optional extra: - Use <code>actionButton</code> and <code>bindEvent()</code> to control when the plot is rendered</p>
 </div><div class="column" style="width:50%;">
 <div class="cell" data-reveal="true">
 <div class="cell-output-display">
@@ -899,33 +999,35 @@ class G sout
 </div>
 </div>
 </section>
-<section id="software-vs.-scripts" class="slide level2">
-<h2>Software vs.&nbsp;scripts</h2>
+<section id="applications-vs.-scripts" class="slide level2">
+<h2>Applications vs.&nbsp;scripts</h2>
 <ul>
-<li>Software has users and users can break things</li>
-<li>What happens if write this, but a user uploads a <code>.jpeg</code> instead of <code>.csv</code>?</li>
+<li>Execution is circular, not linear</li>
+<li>Applications have users and users can break things</li>
+<li>What happens if you write this, but a user uploads a <code>.jpeg</code> instead of <code>.csv</code>?</li>
 <li>Need to try and consider all the possibilities and manage them</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">fileInput</span>(<span class="st">"file"</span>, <span class="st">"Upload .csv file"</span>)</span>
-<span id="cb14-2"><a href="#cb14-2"></a>df <span class="ot">&lt;-</span> <span class="fu">reactive</span>({<span class="fu">req</span>(input<span class="sc">$</span>file)</span>
-<span id="cb14-3"><a href="#cb14-3"></a>                <span class="fu">read.csv</span>(input<span class="sc">$</span>file<span class="sc">$</span>datapath)<span class="er">)</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">fileInput</span>(<span class="st">"file"</span>, <span class="st">"Upload .csv file"</span>)</span>
+<span id="cb21-2"><a href="#cb21-2"></a>df <span class="ot">&lt;-</span> <span class="fu">reactive</span>({<span class="fu">req</span>(input<span class="sc">$</span>file)</span>
+<span id="cb21-3"><a href="#cb21-3"></a>                <span class="fu">read.csv</span>(input<span class="sc">$</span>file<span class="sc">$</span>datapath)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="section" class="slide level2">
-<h2></h2>
+<section id="applications-vs.-scripts-1" class="slide level2">
+<h2>Applications vs.&nbsp;scripts</h2>
+<ul>
+<li>Execution is circular, not linear</li>
+<li>Applications have users and users can break things</li>
+<li>What happens if you write this, but a user uploads a <code>.jpeg</code> instead of <code>.csv</code>?</li>
+<li>Need to try and consider all the possibilities and manage them</li>
+</ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">fileInput</span>(<span class="st">"file"</span>, <span class="st">"Upload .csv file"</span>, <span class="at">accept=</span><span class="st">".csv"</span>)</span>
-<span id="cb15-2"><a href="#cb15-2"></a>df <span class="ot">&lt;-</span> <span class="fu">reactive</span>({<span class="fu">req</span>(input<span class="sc">$</span>file)</span>
-<span id="cb15-3"><a href="#cb15-3"></a>                ext <span class="ot">&lt;-</span> tools<span class="sc">:</span><span class="fu">file_ext</span>(input<span class="sc">$</span>file<span class="sc">$</span>datapath)</span>
-<span id="cb15-4"><a href="#cb15-4"></a>                <span class="cf">if</span> (ext <span class="sc">==</span> <span class="st">".csv"</span>){</span>
-<span id="cb15-5"><a href="#cb15-5"></a>                <span class="fu">read.csv</span>(input<span class="sc">$</span>file<span class="sc">$</span>datapath)<span class="er">)</span>  </span>
-<span id="cb15-6"><a href="#cb15-6"></a>                } <span class="cf">else</span> {</span>
-<span id="cb15-7"><a href="#cb15-7"></a>                  <span class="fu">showModal</span>(<span class="fu">modalDialog</span>(<span class="at">title =</span> <span class="st">"Warning"</span>, <span class="st">"Please upload a .csv file"</span>))</span>
-<span id="cb15-8"><a href="#cb15-8"></a>                }</span>
-<span id="cb15-9"><a href="#cb15-9"></a>                })</span>
-<span id="cb15-10"><a href="#cb15-10"></a></span>
-<span id="cb15-11"><a href="#cb15-11"></a>shiny<span class="sc">::</span><span class="fu">showModal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">fileInput</span>(<span class="st">"file"</span>, <span class="st">"Upload .csv file"</span>, <span class="at">accept =</span> <span class="st">".csv"</span>)</span>
+<span id="cb22-2"><a href="#cb22-2"></a>df <span class="ot">&lt;-</span> <span class="fu">reactive</span>({<span class="fu">req</span>(input<span class="sc">$</span>file)</span>
+<span id="cb22-3"><a href="#cb22-3"></a>                ext <span class="ot">&lt;-</span> tools<span class="sc">::</span><span class="fu">file_ext</span>(input<span class="sc">$</span>file<span class="sc">$</span>datapath)</span>
+<span id="cb22-4"><a href="#cb22-4"></a>                <span class="fu">validate</span>(<span class="fu">need</span>(ext <span class="sc">==</span> <span class="st">"csv"</span>), <span class="st">"Please upload a .csv file"</span>)</span>
+<span id="cb22-5"><a href="#cb22-5"></a>                <span class="fu">read.csv</span>(input<span class="sc">$</span>file<span class="sc">$</span>datapath)  </span>
+<span id="cb22-6"><a href="#cb22-6"></a>                })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="downloads" class="slide level2">
@@ -935,15 +1037,44 @@ class G sout
 <h2>Exercise 3</h2>
 <ul>
 <li>UI layout</li>
+<li>Leaflet</li>
 <li>Download</li>
 </ul>
 </section>
-<section id="leaflet" class="slide level2">
-<h2>Leaflet</h2>
+<section id="interactive-maps" class="slide level2">
+<h2>Interactive maps</h2>
 <ul>
-<li>Leaflet is a package for creating interactive maps</li>
-<li><code>renderLeaflet()</code> and <code>leafletOutput()</code></li>
+<li><code>{leaflet}</code> is a package for creating interactive maps</li>
+<li><code>renderLeaflet()</code> for the server and <code>leafletOutput()</code> for the UI</li>
 </ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>output<span class="sc">$</span>map <span class="ot">&lt;-</span> <span class="fu">renderLeaflet</span>({</span>
+<span id="cb23-2"><a href="#cb23-2"></a>  <span class="fu">leaflet</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb23-3"><a href="#cb23-3"></a>    <span class="fu">addPolygons</span>(sf_object) <span class="sc">%&gt;%</span></span>
+<span id="cb23-4"><a href="#cb23-4"></a>    <span class="fu">addRasterImage</span>(raster_image) <span class="sc">%&gt;%</span></span>
+<span id="cb23-5"><a href="#cb23-5"></a>    terra<span class="sc">::</span><span class="fu">plet</span>(terra_object) <span class="co">#currently requires dev version: </span></span>
+<span id="cb23-6"><a href="#cb23-6"></a>                              <span class="co">#remotes::install_github("rstudio/leaflet")</span></span>
+<span id="cb23-7"><a href="#cb23-7"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="more-leaflet" class="slide level2">
+<h2>More leaflet</h2>
+<ul>
+<li>Many different options for background maps, legends, symbols, pop-ups, zooming, controlling visible layers</li>
+<li><code>{leaflet.extras}</code> has tools for drawing shapes on the map which can be used to edit data</li>
+<li>You will normally want to use <code>leafletProxy()</code> which prevents completely re-rendering the map whenever something changes:</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>output<span class="sc">$</span>map <span class="ot">&lt;-</span> <span class="fu">renderLeaflet</span>({</span>
+<span id="cb24-2"><a href="#cb24-2"></a>  <span class="fu">leaflet</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb24-3"><a href="#cb24-3"></a>    <span class="fu">addPolygons</span>(sf_object)</span>
+<span id="cb24-4"><a href="#cb24-4"></a>  })</span>
+<span id="cb24-5"><a href="#cb24-5"></a></span>
+<span id="cb24-6"><a href="#cb24-6"></a><span class="fu">observe</span>({</span>
+<span id="cb24-7"><a href="#cb24-7"></a>    map <span class="sc">%&gt;%</span></span>
+<span id="cb24-8"><a href="#cb24-8"></a>      <span class="fu">addRasterImage</span>(raster_image[<span class="fu">values</span>(raster_image) <span class="sc">&gt;</span> input<span class="sc">$</span>threshold])</span>
+<span id="cb24-9"><a href="#cb24-9"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="ui-layouts" class="slide level2">
 <h2>UI layouts</h2>
@@ -956,6 +1087,22 @@ class G sout
 <li><a href="https://bootswatch.com/">bootswatch.com</a></li>
 </ul>
 <iframe width="1000" height="400" src="https://bootswatch.com/" title="Bootswatch"></iframe>
+</section>
+<section id="cascading-style-sheets" class="slide level2">
+<h2>Cascading style sheets</h2>
+<ul>
+<li>css determines the appearance of elements on web pages</li>
+<li>You can add your own css to the UI to change how elements appear</li>
+<li>Right-clicking / Ctrl+clicking allows you to inspect the html</li>
+<li>Often requires trial and error!</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(</span>
+<span id="cb25-2"><a href="#cb25-2"></a>  tags<span class="sc">$</span><span class="fu">head</span>(</span>
+<span id="cb25-3"><a href="#cb25-3"></a>      tags<span class="sc">$</span><span class="fu">style</span>(<span class="at">type=</span><span class="st">"text/css"</span>, </span>
+<span id="cb25-4"><a href="#cb25-4"></a>                 <span class="st">".shiny-output-error-validation {color: green; font-size: 18px}"</span></span>
+<span id="cb25-5"><a href="#cb25-5"></a>      )))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="file-structures" class="slide level2">
 <h2>File structures</h2>
@@ -971,16 +1118,18 @@ class G sout
 <section id="common-pitfalls" class="slide level2">
 <h2>Common pitfalls</h2>
 <ul>
-<li>Trying to use reactive objects in a non-reactive context</li>
-<li>Not appending reactive objects with <code>()</code> when accessing their values</li>
-<li>Typos in <code>input</code> or <code>output</code> ids</li>
-<li>Using the same id twice</li>
-<li>Brackets and commas in UI</li>
+<li><p>Trying to use reactive objects in a non-reactive context</p></li>
+<li><p>Not appending reactive objects with <code>()</code> when accessing their values</p></li>
+<li><p>Naming a <code>reactive()</code> variable the same as a loaded function</p></li>
+<li><p>Typos in <code>input</code> or <code>output</code> IDs</p></li>
+<li><p>Using the same id twice</p></li>
+<li><p>Misplaced brackets or commas in UI</p></li>
 </ul>
 </section>
 <section id="debugging" class="slide level2">
 <h2>Debugging</h2>
 <ul>
+<li>Apps are run in their own environment, so you can’t inspect objects in the Rstudio environment tab</li>
 <li>Run the code in a standard R script or .Rmd to check it works as you expect</li>
 <li>Use <code>verbatimTextOutput()</code> and <code>textOutput()</code> to display objects - are they in the state you expect?</li>
 <li>Include <code>options(shiny.fullstacktrace = TRUE)</code> in the server</li>
@@ -1002,19 +1151,19 @@ class G sout
 <li>Many other options available</li>
 </ul>
 </section>
+<section id="what-happens-when-you-deploy" class="slide level2">
+<h2>What happens when you deploy</h2>
+<ul>
+<li>Copies the code from the app directory</li>
+<li>Uses <code>{renv}</code> to check your R version and what package versions the app uses</li>
+<li>Replicates the environment of your machine on their server</li>
+<li>R runs on their server and sends the results to the browser</li>
+</ul>
+</section>
 <section id="create-an-account" class="slide level2">
 <h2>Create an account</h2>
 <ul>
 <li>Register</li>
-</ul>
-</section>
-<section id="basics-on-what-shinyapps-does" class="slide level2">
-<h2>Basics on what shinyapps does</h2>
-<ul>
-<li>Copies the code from the app directory</li>
-<li>Checks what R version you are using</li>
-<li>Looks at the calls to <code>library()</code> to establish which packages are used and their versions</li>
-<li>Replicates the environment of your machine.</li>
 </ul>
 </section>
 <section id="resources" class="slide level2">
@@ -1048,6 +1197,11 @@ output$animal_photo <- renderUI({
   
   HTML(glue::glue('<img src="{url}" height="200px">{credit}'))
 })
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+output$my_widget <- renderUI({sliderInput("slider", "Value", value = 5, min = 1, max = input$max_value)})
+output$slider_value <- renderText(input$slider)
 </script>
  
 <script type="application/shiny-prerendered" data-context="server-extras">
