@@ -6,6 +6,7 @@ format:
   revealjs:
     logo: images/uol_logo.png
     chalkboard: true
+    code-line-numbers: false
 server: shiny
 date: "7 February 2024"
 preload-iframes: true
@@ -18,8 +19,16 @@ code.sourceCode {
   font-size: 0.8em;
 }
 
+.largecode code.sourceCode {
+font-size: 1.5em;
+}
+
+li.smalltext {
+font-size: 30px;
+}
+
 table {
-font-size: 30px
+font-size: 30px;
 }
 
 /*logo*/
@@ -30,12 +39,12 @@ font-size: 30px
 }
 
 /*Shiny input and outputs*/
-.shiny-input-container, .shiny-bound-output {
+.shiny-input-container, .shiny-bound-output, .shiny-input-text {
 box-sizing: border-box;
 color: rgb(51, 51, 51);
 font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-font-size: 18px;
-line-height: 20px;
+font-size: 25px;
+line-height: 28px;
 margin-bottom: 15px;
 max-width: 100%;
 width: 300px
@@ -57,28 +66,37 @@ width: 300px
 
 ```
 
+```{r eval=TRUE, echo=FALSE}
+library(shiny)
+library(dplyr)
+library(leaflet)
+```
+
 -   Background in plant sciences and agricultural science
 -   Latecomer to R, only started in 2018
--   Software developer in Population Health Sciences at University of Leicester
+-   Software developer in Population Health Sciences at University of Leicester with Tim Lucas
 -   Collaborating with Dave Redding on Disagapp for high resolution mapping of disease
 -   <https://github.com/simon-smart88>
 
 ## Workshop overview
-- Trying to be broad but shallow so you know what's possible, rather than narrow but exhaustive
-- Please interrupt: If you're not sure then someone else isn't
-- Aiming for 50:50 me talking:you writing
-- Code examples are not always complete i.e. not all required arguments are used
+
+-   Trying to be broad but shallow so you know what's possible, rather than narrow but exhaustive
+-   Please interrupt: If you're not sure then someone else isn't
+-   Aiming for 50:50 me talking:you writing
+-   Code examples are not always complete i.e. not all required arguments are used
 
 ## Overview for this morning
+
 -   Introduction to Shiny
--   How writing Shiny code differs from normal R
+-   Reactivity and why writing Shiny code differs from normal R
 -   Create example apps
 
 ## Overview for the afternoon
+
 -   User interface design
 -   Interactive maps
 -   Deploying your app to the web
--   Common problems and debugging 
+-   Common problems and debugging
 
 ## What is Shiny?
 
@@ -87,69 +105,109 @@ width: 300px
 -   No need to learn any web development (html, css, javascript)
 -   If you can do something in R, you can publish it online using Shiny
 
+## Download materials {.largecode}
+
+-   `git clone https://github.com/simon-smart88/shinyworkshop`
+
+```{r eval = FALSE, echo = TRUE}
+unzip(download.file(url = "t.ly/Y6ZDH", destfile = "shinyworkshop.zip"))
+```
+
+-   For the slides to be interactive, you need to run `slides.qmd`
+
 ```{r}
-## {=html} 
 ## {data-menu-title="Tomvision"}
+## {=html} 
 ##<iframe width="100%" height="100%" src="https://tomvision.shinyapps.io/tomvision/"</iframe>
 
-## {background-iframe="https://web.niab.com/pym-dashboard/?page=sign_in" background-interactive="true"}
+## {data-menu-title="Potato dashboard"}
+## {=html} 
+##<iframe width="100%" height="100%" src="https://web.niab.com/pym-dashboard/?page=sign_in"</iframe>
 
-## {background-iframe="https://simonsmart.shinyapps.io/shinyscholar/" background-interactive="true"}
+## {data-menu-title="Shinyscholar"}
+## {=html} 
+##<iframe width="100%" height="100%" src="https://simonsmart.shinyapps.io/shinyscholar/"</iframe>
 ```
 
-## Download materials
-
-- `git clone https://github.com/simon-smart88/shinyworkshop`
-```{r eval = FALSE, echo = TRUE}
-download.file(url = "t.ly/Y6ZDH", destfile = "shinyworkshop.zip")
-```
-
-## Structure of a Shiny app
+## Structure of a Shiny app {.largecode}
 
 Shiny apps consist of a user interface object (UI) and a server object
 
 ```{r eval = FALSE, echo = TRUE}
-ui <- fluidPage()
+ui <- fluidPage() 
 
 server <- function(input, output) {}
 
 shinyApp(ui = ui, server = server)
 ```
 
-## Transfer between the UI and server
-- The server function takes two `list()`-like objects as arguments:
-    - `input$` where settings made in the UI are stored
-        - Created for you by objects in the UI
-        - Values are read-only
-    - `output$` where objects created in the server that need to be displayed in the UI are stored
-        - You declare them yourself
+## Structure of a Shiny app {.largecode}
 
-## Input and output IDs  
-- The objects in `input$` and `output$` have an ID used to refer to them
-- These must be unique or you will get errors
-- For `input$` objects, the ID is always the first argument of the function used to create them:
+Shiny apps consist of a user interface object (UI) and a server object
+
+::: columns
+::: {.column width="80%"}
+```{r eval = FALSE, echo = TRUE}
+ui <- fluidPage() 
+
+server <- function(input, output) {}
+
+shinyApp(ui = ui, server = server)
+```
+:::
+
+::: {.column width="20%"}
+-   Seeing
+
+-   Doing
+:::
+:::
+
+-   Our job is to make these objects talk to each other
+
+## Communication between the UI and server
+
+-   The server function takes two `list()`-like objects as arguments:
+    -   `input$` where settings made in the UI are stored
+        -   Created for you by objects in the UI
+        -   Values are read-only
+    -   `output$` where objects created in the server that need to be displayed in the UI are stored
+        -   You create them
+
+## Input and output IDs {.largecode}
+
+-   The objects in `input$` and `output$` have an ID used to refer to them
+-   These must be unique or you will get errors
+-   For `input$` objects, the ID is always the first argument of the function used to create them:
+
 ```{r eval = FALSE, echo = TRUE}
 textInput("my_first_input") 
 #allows you to use this in server:
 input$my_first_input
 ```
 
-## Input and output IDs  
-- For `output$` objects, you declare them and then reference them by ID in the UI:
+## Input and output IDs {.largecode}
+
+-   For `output$` objects, you declare them and then reference them by ID in the UI:
+
 ```{r eval = FALSE, echo = TRUE}
 output$my_first_output <- renderText("Hello world") 
 #allows you to use this in UI:
 textOutput("my_first_output")
 ```
 
+-   Both are referenced as strings in the UI but as variables in the server
+
 ## Reactivity basics
+
 ::: columns
 ::: {.column width="70%"}
-- Code in the server function is *reactive*
-- If an input value changes, then any code which uses the input is rerun
-- Similarly, any code which uses a value calculated from the input is also rerun
-- Unlike in a normal R script, code isn't executed from top to bottom
+-   Code in the server function is *reactive*
+-   If an `input$` value changes, then any code which uses the input is rerun
+-   Similarly, any code that uses a value calculated from the input is also rerun
+-   Unlike in a normal R script, code isn't executed from top to bottom
 :::
+
 ::: {.column width="30%"}
 ```{mermaid}
 %%| fig-width: 6
@@ -165,6 +223,7 @@ class C sout
 :::
 
 ## A simple example
+
 ::: columns
 ::: {.column width="80%"}
 ```{r eval = FALSE, echo = TRUE}
@@ -189,6 +248,7 @@ textOutput("name_out")
 output$name_out <- renderText(paste0("My name is ",input$name))
 ```
 :::
+
 ::: {.column width="20%"}
 ```{mermaid}
 %%| fig-width: 6
@@ -221,13 +281,14 @@ shinyApp(ui = ui, server = server)
 ```
 
 ::: columns
-::: {.column width="30%"}
+::: {.column width="40%"}
 ```{r}
 br()
 selectInput("animal", "Choose your favourite animal", choices=c("", "Whale", "Dinosaur"))
 ```
 :::
-::: {.column width="70%"}
+
+::: {.column width="40%"}
 ```{r}
 br()
 textOutput("animal_name")
@@ -258,6 +319,7 @@ output$animal_photo <- renderUI({
 ```
 
 ## Static code can be put in different places
+
 ```{r eval = FALSE, echo = TRUE}
 df <- read.csv()
 
@@ -276,6 +338,7 @@ shinyApp(ui = ui, server = server)
 ```
 
 ## Static code can be put in different places
+
 ```{r eval = FALSE, echo = TRUE}
 df <- read.csv()
 # run once when the app starts
@@ -296,7 +359,6 @@ server <- function(input, output) {
 
 shinyApp(ui = ui, server = server)
 ```
-
 
 ## Shiny input widgets
 
@@ -322,6 +384,7 @@ textInput()
 :::
 
 Source: <https://shiny.posit.co/r/getstarted/shiny-basics/lesson3/>
+
 ```{r}
 ##  {background-iframe="https://gallery.shinyapps.io/081-widgets-gallery/" background-interactive="true"}
 ```
@@ -339,24 +402,70 @@ Outputs are generated in the server using `render*` functions and displayed in t
 | Interactive table | `renderDataTable()` | `dataTableOutput()` |
 
 ## Curly bracket syntax
+
 -   Typically `render*()` functions are used with curly brackets `{}` inside the function
 -   This lets you write multiple lines of code, but only the last line is returned
 
-## UI development
+## UI development {.largecode}
 
--   `fluidPage()` makes the design *responsive* so that it fits on different sized screens 
+::: columns
+::: {.column width="50%"}
 -   The UI object is one long list
--   Objects need separating by commas 
--   Brackets are important for structuring layout of elements
--   Tabs and lines help to make your code readable
--   It can get very complicated!
+-   `fluidPage()` makes the design *responsive* so that it fits on different sized screens
+-   The first item will be placed in the top left
+-   Functions need separating by commas
+:::
+::: {.column width="50%"}
+\
+
+```{r echo=TRUE, eval=FALSE}
+ui <- fluidPage(
+      actionButton(),
+      checkboxInput(),
+      dateInput(),
+      textOutput(),
+      plotOutput(),
+      tableOutput()
+      )
+```
+:::
+:::
 
 ## Server development
+
 -   Shiny code is more complex to debug and errors may not be simple to understand
 -   Some mistakes won't produce any errors at all
--   It is often helpful to write code in an .Rmd file first and then refactor for reactivity
+-   First write code in an .Rmd file and then refactor for reactivity
 -   Start simple and build complexity gradually
 -   If you don't already, use the F1 key to look at documentation
+
+## tidyverse peculiarities
+
+Unfortunately this will not work as you might expect:
+
+```{r echo=TRUE, eval=FALSE}
+#UI
+selectInput("var", "Variable", choices = c("carat", "depth", "table", "price", "x", "y", "z"))
+numericInput("min", "Minimum", value = 1)
+
+#Server
+data <- reactive(diamonds %>% filter(input$var > input$min))
+```
+
+## tidyverse peculiarities
+
+-   This is the correct syntax:
+
+```{r echo=TRUE, eval=FALSE}
+data <- reactive(diamonds %>% filter(.data[[input$var]] > .env$input$min))
+```
+
+-   See [Mastering Shiny](https://mastering-shiny.org/action-tidy.html) for more details
+-   For now, just use the old-fashioned method:
+
+```{r echo=TRUE, eval=FALSE}
+data <- reactive(diamonds[diamonds[[input$var]] > input$min,])
+```
 
 ## Exercise 1
 
@@ -364,20 +473,21 @@ Create an app where you:
 
 -   Load data from `iris`
 -   Filter the data in some way using `sliderInput()`, `numericInput()` or `selectInput()`
--   Display the output using `renderTable()` and `tableOutput()`
+-   Display the filtered data using `renderTable()` and `tableOutput()`
 
 ```{r}
-head(iris)
+head(iris)[0:3,]
 unique(iris$Species)
 ```
 
 ## `reactive()`
+
 -   If you want to access an `input$` you must do so inside reactive objects
 -   You have already done this - all the `render*` function are reactive
 -   If you want to create an object without making an output though, you need to wrap it inside `reactive()`
 -   The resultant object is a function, so you need to append `()` when you access the values
 
-## `reactive()` example
+## `reactive()` example {.largecode}
 
 ❌
 
@@ -394,6 +504,7 @@ min_petal_length <- min(df()$Petal.Length)
 ```
 
 ## File uploads
+
 -   `fileInput()` uploads the file to the web server, but not into the R environment
 -   The resulting `input$` value is a dataframe containing `name`, `size`, `type` and `datapath` columns
 -   To access the data, you need to process the file using the `datapath` column e.g.:
@@ -404,7 +515,8 @@ df <- reactive(read.csv(input$file$datapath))
 ```
 
 ## `renderUI()` and `uiOutput()`
--   These functions can be used to generate UI elements containing values reliant on other inputs
+
+-   Used to generate UI elements containing values reliant on other inputs
 
 ```{r echo=TRUE, eval=FALSE}
 #UI:
@@ -433,71 +545,150 @@ output$slider_value <- renderText(input$slider)
 
 ## Controlling reactivity
 
-- Reactivity is essential for creating an interactive application but requires managing:
-    - What if some of your functions take seconds or minutes to run?
-    - What if your function uses an `input$` which is `NULL` when the app initiates?
+-   Reactivity is essential for creating an interactive application but requires managing:
+    -   What if some of your functions take seconds or minutes to run?
+    -   What if your function uses an `input$` which is `NULL` when the app initiates?
 
 ## Using `req()`
-- `req()` is used to control execution of a function by defining the values that it *requires*
-- Placed at the top of reactive functions i.e. `reactive()` and `render*()`
-- If the conditions are not met, execution is halted
+
+-   `req()` is used to control execution of a function by defining the values that it *requires*
+-   Placed at the top of reactive functions i.e. `reactive()` and `render*()`
+-   If the conditions are not met, execution is halted
 
 ```{r echo=TRUE, eval=FALSE}
-req(input$file) #checks that the input is not NULL
+req(input$name) #checks that the input is not NULL
 req(input$name == "Simon") #checks a specific condition 
-req(input$file, some_setting == "correct") #checks both conditions
+req(input$name == "Simon", input$check == TRUE) #checks both conditions
+```
+
+::: columns
+::: {.column width="30%"}
+```{r}
+br()
+textInput("name1", "What is your name?")
+checkboxInput("check1", "Tick me!", value = FALSE)
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+br()
+textOutput("name_out1a")
+textOutput("name_out1b")
+textOutput("name_out1c")
+```
+:::
+:::
+
+```{r}
+#| context: server
+output$name_out1a <- renderText({
+req(input$name1) 
+"The first condition is satisfied"})
+
+output$name_out1b <- renderText({
+req(input$name1) 
+req(input$name1 == "Simon")
+"The first and second conditions are satisfied"})
+
+output$name_out1c <- renderText({
+req(input$name1) 
+req(input$name1 == "Simon")
+req(input$name1 == "Simon", input$check1 == TRUE)
+  "All three conditions are satisfied"})
 ```
 
 ## Using `validate()`
-- `validate()` is similar to `req()` but more user-friendly as errors can be passed back to the UI
+
+-   `validate()` is similar to `req()` but more user-friendly as errors can be passed back to the UI
+
 ```{r echo = TRUE, eval = FALSE}
-
-
+validate(need(input$name, "Please enter your name"))
+validate(need(input$name == "Simon", "Your name must be Simon"))
+validate(need(input$name == "Simon", "Your name must be Simon"),
+         need(input$check == TRUE, "The checkbox must be ticked"))
 ```
 
-## Using `actionButton` and `observeEvent()`
-
-UI:
-```{r echo = TRUE, eval = FALSE}
-actionButton("go", "Go!")
+```{r}
+br()
+textInput("name2", "What is your name?")
+checkboxInput("check", "Tick me!", value = FALSE)
+textOutput("name_out2")
 ```
 
-Server:
-```{r echo = TRUE, eval = FALSE}
-observeEvent(input$go, {
-    #do stuff  
-})
+```{r}
+#| context: server
+output$name_out2 <- renderText({
+validate(need(input$name2, "Please enter your name"))
+validate(need(input$name2 == "Simon", "Your name must be Simon"))
+validate(need(input$name2 == "Simon", "Your name must be Simon"),
+         need(input$check == TRUE, "The checkbox must be ticked"))
+  paste0("My name is ",input$name2)})
 ```
 
+## Using `actionButton()` and `bindEvent()` {.largecode}
 
-UI:
+-   Used to explicitly control when code is run
+
 ```{r echo = TRUE, eval = FALSE}
-actionButton("go", "Go!")
-textOutput("pressed")
+actionButton("go", "Do stuff") #UI
+output$name_out <- renderText(input$name) %>% #Server
+  bindEvent(input$go) 
 ```
 
-Server:
-```{r echo = TRUE, eval = FALSE}
-observeEvent(input$go, {
-      
-})
+```{r}
+br()
+textInput("name3", "What is your name?")
+actionButton("go", "Do stuff")
+textOutput("name_out3")
+textOutput("action_value")
 ```
 
+```{r}
+#| context: server
+library(dplyr)
+output$name_out3 <- renderText({paste0("My name is ",input$name3)}) %>% bindEvent(input$go)
+output$action_value <- renderText({
+  req(input$go > 1)
+  paste0("actionButton value = ", input$go)})
+```
 
+## Using `actionButton()` and `observeEvent()` {.largecode}
 
+-   Similar to using `bindEvent()` but for use when the action doesn't produce an output
 
+```{r echo = TRUE, eval = FALSE}
+actionButton("go", "Go!") #UI
+observeEvent(input$go, {do_stuff()}) #Server
+```
 
-## Exercise 2
+```{r}
+br()
+numericInput("number", "Number to send", value = 10)
+actionButton("go_db", "Send to database")
+textOutput("database")
+```
 
-:::columns
+```{r}
+#| context: server
+database_value <- reactiveVal(value = 1)
+observeEvent(input$go_db, {database_value(input$number)}) 
+output$database <- renderText({
+  paste0("The database value is: ", database_value())})
+```
+
+## Exercise 2 {.smalltext}
+
+::: columns
 ::: {.column width="50%"}
 Create an app where you:
+
 -   Upload a spreadsheet - `fileInput()`
 -   Select the names of two columns - `renderUI()` and `selectInput()`
 -   Plot the two columns in a scatter plot - `renderPlot()`
--   Optional extra:
-        - Use `actionButton` and `bindEvent()` to control when the plot is rendered
+-   Optional extra: - Use `actionButton` and `bindEvent()` to control when the plot is rendered
 :::
+
 ::: {.column width="50%"}
 ```{mermaid}
 flowchart TD
@@ -520,22 +711,28 @@ class G sout
 :::
 :::
 
-## Applications vs. scripts 
-- Execution is circular, not linear
-- Applications have users and users can break things
-- What happens if you write this, but a user uploads a `.jpeg` instead of `.csv`?
-- Need to try and consider all the possibilities and manage them
+## Applications vs. scripts
+
+-   Execution is circular, not linear
+-   You are creating a range of possibilities for your user
+-   Applications have users and users can break things
+-   What happens if you write this, but a user uploads a `.jpeg` instead of `.csv`?
+-   Need to try and consider all the possibilities and manage them
+
 ```{r echo=TRUE, eval=FALSE}
 fileInput("file", "Upload .csv file")
 df <- reactive({req(input$file)
                 read.csv(input$file$datapath)})
 ```
 
-## Applications vs. scripts 
-- Execution is circular, not linear
-- Applications have users and users can break things
-- What happens if you write this, but a user uploads a `.jpeg` instead of `.csv`?
-- Need to try and consider all the possibilities and manage them
+## Applications vs. scripts
+
+-   Execution is circular, not linear
+-   You are creating a range of possibilities for your user
+-   Applications have users and users can break things
+-   What happens if you write this, but a user uploads a `.jpeg` instead of `.csv`?
+-   Need to try and consider all the possibilities and manage them
+
 ```{r echo=TRUE, eval=FALSE}
 fileInput("file", "Upload .csv file", accept = ".csv")
 df <- reactive({req(input$file)
@@ -545,18 +742,33 @@ df <- reactive({req(input$file)
                 })
 ```
 
-
 ## Downloads
+-   `downloadButton()` in the UI
+-   `downloadHandler()` in the server
 
+```{r echo=TRUE, eval=FALSE}
+downloadButton("download_data")
+
+output$download_data <- downloadHandler(
+      filename = function() {
+      paste("data.csv", sep="")
+    },
+    content = function(file) {
+      write.csv(data, file)
+    }
+)
+```
 
 ## Exercise 3
-- UI layout
-- Leaflet
-- Download 
+
+-   UI layout
+-   Leaflet
+-   Download
 
 ## Interactive maps
-- `{leaflet}` is a package for creating interactive maps
-- `renderLeaflet()` for the server and `leafletOutput()` for the UI
+
+-   `{leaflet}` is a package for creating interactive maps
+-   `renderLeaflet()` for the server and `leafletOutput()` for the UI
 
 ```{r echo=TRUE, eval=FALSE}
 output$map <- renderLeaflet({
@@ -569,9 +781,10 @@ output$map <- renderLeaflet({
 ```
 
 ## More leaflet
-- Many different options for background maps, legends, symbols, pop-ups, zooming, controlling visible layers
-- `{leaflet.extras}` has tools for drawing shapes on the map which can be used to edit data
-- You will normally want to use `leafletProxy()` which prevents completely re-rendering the map whenever something changes:
+
+-   Many different options for background maps, legends, symbols, pop-ups, zooming, controlling visible layers
+-   `{leaflet.extras}` has tools for drawing shapes on the map which can be used to edit data
+-   You will normally want to use `leafletProxy()` which prevents completely re-rendering the map whenever something changes:
 
 ```{r echo=TRUE, eval=FALSE}
 output$map <- renderLeaflet({
@@ -587,19 +800,26 @@ observe({
 
 ## UI layouts
 
+-   Brackets are important for structuring layout of elements
+-   Tabs and lines help to make your code readable
+-   It can get very complicated!
+
 ## Themes
-- Themes can be used to change the appearance of all the elements of an app in one go
-- `fluidPage(theme = bslib::bs_theme("<theme name>"))`
-- [bootswatch.com](https://bootswatch.com/)
+
+-   Themes can be used to change the appearance of all the elements of an app in one go
+-   `fluidPage(theme = bslib::bs_theme("<theme name>"))`
+-   [bootswatch.com](https://bootswatch.com/)
+
 ```{=html}
 <iframe width="1000" height="400" src="https://bootswatch.com/" title="Bootswatch"></iframe>
 ```
-
 ## Cascading style sheets
-- css determines the appearance of elements on web pages
-- You can add your own css to the UI to change how elements appear
-- Right-clicking / Ctrl+clicking allows you to inspect the html 
-- Often requires trial and error!
+
+-   css determines the appearance of elements on web pages
+-   You can add your own css to the UI to change how elements appear
+-   Right-clicking / Ctrl+clicking allows you to inspect the html
+-   Often requires trial and error!
+
 ```{r echo = TRUE, eval = FALSE}
 ui <- fluidPage(
   tags$head(
@@ -609,26 +829,31 @@ ui <- fluidPage(
 ```
 
 ## File structures
-- Standalone as `app.R`
-- Separate files for server and UI - `server.R` and `ui.R`
-- `global.R` - loaded before `server.R` and `ui.R` so can be a good place to load data 
+
+-   Various file structures can be used depending on complexity
+-   Standalone as `app.R`
+-   Separate files for server and UI - `server.R` and `ui.R`
+-   `global.R` - loaded before `server.R` and `ui.R` so can be a good place to load data
+-   If `server.R` and `ui.R` become very long, code can be modularised into infinite files
 
 ## Templates
 
-
-
 ## Common pitfalls
+
 -   Trying to use reactive objects in a non-reactive context
 
-
-
 -   Not appending reactive objects with `()` when accessing their values
+
 -   Naming a `reactive()` variable the same as a loaded function
+
 -   Typos in `input` or `output` IDs
--   Using the same id twice
+
+-   Using the same ID twice
+
 -   Misplaced brackets or commas in UI
 
 ## Debugging
+
 -   Apps are run in their own environment, so you can't inspect objects in the Rstudio environment tab
 -   Run the code in a standard R script or .Rmd to check it works as you expect
 -   Use `verbatimTextOutput()` and `textOutput()` to display objects - are they in the state you expect?
@@ -637,26 +862,38 @@ ui <- fluidPage(
 -   Create a simple app containing only the problematic elements (i.e. a minimal, reproducible example)
 
 ## Deployment
+
 -   Publish your app so that others can use it
--   We will use [shinyapps.io](https://shinyapps.io)
+-   We will use [shinyapps.io](https://shinyapps.io) run by Posit
 -   Free and easy to use but has limitations:
-    - Only 1GB RAM on free tiers which may not be enough to run models
-    - Limited amount of use per month
-    - No persistent data storage
+    -   Only 1GB RAM on free tiers which may not be enough to run models
+    -   Limited amount of use per month (25 hours)
+    -   No persistent data storage
 -   Many other options available
 
 ## What happens when you deploy
-- Copies the code from the app directory
-- Uses `{renv}` to check your R version and what package versions the app uses
-- Replicates the environment of your machine on their server 
-- R runs on their server and sends the results to the browser
 
-## Create an account
--   Register
+-   Copies the code from the app directory
+-   Uses `{renv}` to check your R version and what package versions the app uses
+-   Replicates the environment of your machine on their server
+-   R runs on their server and sends the results to the browser
+
+## How to deploy
+
+-   Register: <https://www.shinyapps.io/auth/oauth/signup>
+-   Copy your token and secret: <https://www.shinyapps.io/admin/#/tokens>
+-   Click "Show" on right hand side and then "Show secret"
+-   Copy and run the code which looks like this:
+
+```{r echo=TRUE, eval = FALSE}
+rsconnect::setAccountInfo(name='simonsmart',
+			  token='E72042914BFED931FDE0C96A1',
+			  secret='kowe90erweioj2312iuj2o4ij2jij')
+```
 
 ## Resources
 
-- [Get started guide from Posit](https://shiny.posit.co/r/getstarted/)
-- [Mastering Shiny](https://mastering-shiny.org/)
-- [Outstanding User Interfaces with Shiny](https://unleash-shiny.rinterface.com/)
-- [Engineering Production-Grade Shiny Apps](https://engineering-shiny.org/)
+-   [Get started guide from Posit](https://shiny.posit.co/r/getstarted/)
+-   [Mastering Shiny](https://mastering-shiny.org/)
+-   [Outstanding User Interfaces with Shiny](https://unleash-shiny.rinterface.com/)
+-   [Engineering Production-Grade Shiny Apps](https://engineering-shiny.org/)
