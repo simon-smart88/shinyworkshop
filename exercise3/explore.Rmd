@@ -1,0 +1,37 @@
+```{r}
+library(terra)
+library(sf)
+library(leaflet)
+library(dplyr)
+
+fcover <- terra::rast("london_fcover.tif")
+wards <- sf::st_read("London_Ward.shp")
+
+#reproject shapes to same CRS as the raster
+wards <- sf::st_transform(wards, crs(fcover))
+
+#combine wards into districts
+districts <- wards %>% 
+    group_by(DISTRICT) %>%
+    summarise(geometry = sf::st_union(geometry)) %>%
+    ungroup()
+
+leaflet() %>%
+  addProviderTiles("Esri.WorldTopoMap") %>%
+  addRasterImage(ras) %>%
+  addPolygons(data = wards, color = "black", weight = 1)
+
+
+ward_values <- terra::extract(fcover, wards, ID = TRUE, layer= TRUE, exact = TRUE)
+colnames(ward_values ) <- c("polygon", "fcover", "fraction")
+ward_ids <- data.frame(id = 1:nrow(wards), ward = wards$NAME)
+ward_values <- merge(ward_values, ward_ids, by.x = "polygon", by.y = "id" )
+
+district_values <- terra::extract(fcover, districts, ID = TRUE, layer= TRUE, exact = TRUE)
+
+
+ward_fcover <- terra::crop(fcover, wards[wards$NAME == wards$NAME[1],])
+
+plot(ward_fcover)
+```
+

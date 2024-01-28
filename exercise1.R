@@ -9,9 +9,7 @@ ui <- fluidPage(
 
 server <- function(input, output) {
 
-  data <- iris
-
-  renderTable({})
+  renderTable({iris})
 }
 
 shinyApp(ui = ui, server = server)
