@@ -9,7 +9,7 @@ format:
     code-line-numbers: false
 server: shiny
 date: "7 February 2024"
-preload-iframes: true
+preload-iframes: false
 ---
 
 ## About me
@@ -23,8 +23,12 @@ code.sourceCode {
 font-size: 1.5em;
 }
 
-li.smalltext {
-font-size: 30px;
+.mediumcode code.sourceCode {
+font-size: 1.1em;
+}
+
+p.smalltext {
+font-size: 30px !important;
 }
 
 table {
@@ -43,13 +47,31 @@ font-size: 30px;
 box-sizing: border-box;
 color: rgb(51, 51, 51);
 font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-font-size: 25px;
-line-height: 28px;
+font-size: 22px;
+line-height: 25px;
 margin-bottom: 15px;
 max-width: 100%;
-width: 300px
+width: 400px
 }
 
+
+/*Datatable*/
+table {
+font-size: 16px;
+}
+
+table.dataTable tbody td {
+padding: 2px 2px;
+}
+
+.dataTables_wrapper, .dataTables_info {
+font-size: 16px;
+}
+
+/* Shiny error message*/
+.shiny-output-error-validation {
+color: green;
+}
 
 /*mermaid-diagrams*/
 /*input, server, output*/
@@ -94,7 +116,7 @@ library(leaflet)
 ## Overview for the afternoon
 
 -   User interface design
--   Interactive maps
+-   Interactive tables and maps
 -   Deploying your app to the web
 -   Common problems and debugging
 
@@ -110,9 +132,11 @@ library(leaflet)
 -   `git clone https://github.com/simon-smart88/shinyworkshop`
 
 ```{r eval = FALSE, echo = TRUE}
-unzip(download.file(url = "t.ly/Y6ZDH", destfile = "shinyworkshop.zip"))
+unzip(download.file(url = "t.ly/Y6ZDH", 
+                    destfile = "shinyworkshop.zip"))
 ```
 
+- `install.packages(c("shiny","leaflet", "DT", "rsconnect"))`
 -   For the slides to be interactive, you need to run `slides.qmd`
 
 ```{r}
@@ -201,16 +225,17 @@ textOutput("my_first_output")
 ## Reactivity basics
 
 ::: columns
-::: {.column width="70%"}
+::: {.column width="60%"}
 -   Code in the server function is *reactive*
 -   If an `input$` value changes, then any code which uses the input is rerun
 -   Similarly, any code that uses a value calculated from the input is also rerun
 -   Unlike in a normal R script, code isn't executed from top to bottom
 :::
 
-::: {.column width="30%"}
+::: {.column width="40%"}
 ```{mermaid}
-%%| fig-width: 6
+%%| fig-width: 4
+%%| fig-height: 5
 flowchart TD
 A[Input in UI] --> |input$| B([Computation in server])
 B --> |output$| C(Output in UI)
@@ -225,7 +250,7 @@ class C sout
 ## A simple example
 
 ::: columns
-::: {.column width="80%"}
+::: {.column width="70%"}
 ```{r eval = FALSE, echo = TRUE}
 ui <- fluidPage(textInput("name", "What is your name?"),
                 textOutput("name_out"))
@@ -249,9 +274,10 @@ output$name_out <- renderText(paste0("My name is ",input$name))
 ```
 :::
 
-::: {.column width="20%"}
+::: {.column width="30%"}
 ```{mermaid}
-%%| fig-width: 6
+%%| fig-width: 3
+%%| fig-height: 5
 flowchart TD
 A["textInput()"] --> |input$name| B(["renderText()"])
 B --> |output$name_out| C("textOutput()")
@@ -543,6 +569,40 @@ output$my_widget <- renderUI({sliderInput("slider", "Value", value = 5, min = 1,
 output$slider_value <- renderText(input$slider)
 ```
 
+## `observe()`
+- Similar to `reactive()` but doesn't return a result
+
+```{r echo=TRUE, eval=FALSE}
+numericInput("max_value", "Max value", value = 10)
+sliderInput("slider", "Value", value = 5, min = 1, 10)
+textOutput("slider_value")
+#Server:
+observe({
+  updateSliderInput(
+      inputId = "slider",
+      max = input$max_value
+  )  
+})
+```
+
+```{r}
+br()
+numericInput("max_value2", "Max value", value = 10)
+sliderInput("slider2", "Value", value = 5, min = 1, 10)
+textOutput("slider_value2")
+```
+
+```{r}
+#| context: server
+observe({
+  updateSliderInput(
+      inputId = "slider2",
+      max = input$max_value2
+  )  
+})
+output$slider_value2 <- renderText(input$slider2)
+```
+
 ## Controlling reactivity
 
 -   Reactivity is essential for creating an interactive application but requires managing:
@@ -598,9 +658,9 @@ req(input$name1 == "Simon", input$check1 == TRUE)
   "All three conditions are satisfied"})
 ```
 
-## Using `validate()`
+## Using `validate()` and `need()`
 
--   `validate()` is similar to `req()` but more user-friendly as errors can be passed back to the UI
+-   `validate(need())` is similar to `req()` but more user-friendly as errors can be passed back to the UI
 
 ```{r echo = TRUE, eval = FALSE}
 validate(need(input$name, "Please enter your name"))
@@ -677,18 +737,18 @@ output$database <- renderText({
   paste0("The database value is: ", database_value())})
 ```
 
-## Exercise 2 {.smalltext}
+## Exercise 2 {.smaller}
 
 ::: columns
 ::: {.column width="50%"}
 Create an app where you:
 
--   Upload a spreadsheet - `fileInput()`
+-   Upload `iris.csv` using  `fileInput()`
 -   Select the names of two columns - `renderUI()` and `selectInput()`
 -   Plot the two columns in a scatter plot - `renderPlot()`
--   Optional extra: - Use `actionButton` and `bindEvent()` to control when the plot is rendered
+-   Optional extra: 
+    - Use `actionButton` and `bindEvent()` to control when the plot is rendered
 :::
-
 ::: {.column width="50%"}
 ```{mermaid}
 flowchart TD
@@ -759,6 +819,38 @@ output$download_data <- downloadHandler(
 )
 ```
 
+## Interactive tables
+- Datatables are created with `DT::renderDataTable()` in the server and `DT::dataTableOutput()` in the UI:
+
+```{r echo = TRUE, eval=FALSE}
+DT::dataTableOutput("datatable") 
+output$datatable <- DT::renderDataTable(iris) 
+```
+
+```{r}
+DT::dataTableOutput("datatable")
+```
+
+```{r}
+#| context: server
+output$datatable <- DT::renderDataTable(iris, options = list(pageLength = 5))
+```
+
+## Interactive tables
+
+- You can access the selected row(s) using `input$<table ID>_rows_selected`
+
+```{r}
+DT::dataTableOutput("datatable2")
+textOutput("selected_row")
+```
+
+```{r}
+#| context: server
+output$datatable2 <- DT::renderDataTable(iris, options = list(pageLength = 5))
+output$selected_row <- renderText({glue::glue("You have selected rows: {input$datatable2_rows_selected}")})
+```
+
 ## Exercise 3
 
 -   UI layout
@@ -780,11 +872,41 @@ output$map <- renderLeaflet({
 })
 ```
 
+## An example
+
+```{r}
+leafletOutput("map")
+```
+
+```{r}
+#| context: server
+fcover <- terra::rast("exercise3/london_fcover.tif")
+wards <- sf::st_read("exercise3/London_Ward.shp")
+
+#reproject shapes to same CRS as the raster
+wards <- sf::st_transform(wards, terra::crs(fcover))
+
+output$map <- leaflet::renderLeaflet({
+              leaflet::leaflet() %>%
+              leaflet::addProviderTiles("Esri.WorldTopoMap") %>%
+              leaflet::addRasterImage(fcover) %>%
+              leaflet::addPolygons(data = wards, color = "black", weight = 1)
+              })
+```
 ## More leaflet
 
--   Many different options for background maps, legends, symbols, pop-ups, zooming, controlling visible layers
+-   Functions for:
+    - background maps - `addProviderTiles()`
+    - legends - `addLegend()`
+    - symbols - `addMarkers()`
+    - pop-ups - `addPopups()`
+    - zooming - `setView()`
+    - controlling visible layers- `addLayersControl()`
 -   `{leaflet.extras}` has tools for drawing shapes on the map which can be used to edit data
--   You will normally want to use `leafletProxy()` which prevents completely re-rendering the map whenever something changes:
+
+## Leaflet proxy
+
+-   `leafletProxy()` prevents completely re-drawing the map whenever something changes:
 
 ```{r echo=TRUE, eval=FALSE}
 output$map <- renderLeaflet({
@@ -792,17 +914,350 @@ output$map <- renderLeaflet({
     addPolygons(sf_object)
   })
 
+proxy_map <- leafletProxy("map")
+
 observe({
-    map %>%
-      addRasterImage(raster_image[values(raster_image) > input$threshold])
+    proxy_map %>%
+      addRasterImage(
+        terra::clamp(
+          fcover, input$threshold, value = FALSE))
 })
+
+```
+
+## Without leafletproxy 
+
+```{r}
+leafletOutput("map2")
+numericInput("thresh1", "Threshold", value = 50)
+```
+
+```{r}
+#| context: server
+
+output$map2 <- leaflet::renderLeaflet({
+              leaflet::leaflet() %>%
+              leaflet::addProviderTiles("Esri.WorldTopoMap") %>%
+              leaflet::addRasterImage(terra::clamp(fcover, input$thresh1 , value=FALSE)) %>%
+              leaflet::addPolygons(data = wards, color = "black", weight = 1)
+              })
+```
+
+## With leafletproxy
+
+```{r}
+leafletOutput("map3")
+numericInput("thresh2", "Threshold", value = 50)
+```
+
+```{r}
+#| context: server
+
+output$map3 <- leaflet::renderLeaflet({
+              leaflet::leaflet() %>%
+              leaflet::addProviderTiles("Esri.WorldTopoMap") %>%
+              leaflet::addPolygons(data = wards, color = "black", weight = 1)
+              })
+
+proxy_map <- leaflet::leafletProxy("map3")
+
+observe({
+  req(!is.na(input$thresh2))
+  proxy_map %>%
+    leaflet::addRasterImage(terra::clamp(fcover, input$thresh2 , value=FALSE)) 
+})
+
+output$selected_shape <- renderText({
+  selected_point <- data.frame(x = input$map3_shape_click$lng, y = input$map3_shape_click$lat ) %>% 
+                     sf::st_as_sf(coords = c("x", "y"), crs = 4326) 
+
+index_of_polygon <- sf::st_intersects(selected_point, wards, sparse = T) %>% 
+                    as.numeric()
+
+glue::glue("You clicked on the ward of {wards$NAME[index_of_polygon]} which is in {wards$DISTRICT[index_of_polygon]}")
+  })
+
+```
+
+## Accessing information from the map {.smaller}
+- There are `input$` values that record events occurring in the map
+- `input$<map ID>_<object type>_<event type>` e.g. `input$map_shape_click`
+- The values are a `list()` containing `$lat` and `$lng` which can be used for further calculations
+- See the Inputs/Events section of <https://rstudio.github.io/leaflet/shiny.html>
+
+```{r echo=TRUE, eval=FALSE}
+output$selected_shape <- renderText({
+  selected_point <- data.frame(x = input$map_shape_click$lng, y = input$map_shape_click$lat ) %>% 
+                     sf::st_as_sf(coords = c("x", "y"), crs = 4326) 
+index_of_polygon <- sf::st_intersects(selected_point, wards, sparse = T) %>% 
+                    as.numeric()
+glue::glue("You clicked on the ward of {wards$NAME[index_of_polygon]} which is in {wards$DISTRICT[index_of_polygon]}")
+  })
+```
+## Accessing information from the map
+
+```{r}
+leafletOutput("map4")
+textOutput("clicked_shape")
+textOutput("mouseover_shape")
+```
+
+```{r}
+#| context: server
+
+output$map4 <- leaflet::renderLeaflet({
+              leaflet::leaflet() %>%
+              leaflet::addProviderTiles("Esri.WorldTopoMap") %>%
+              leaflet::addPolygons(data = wards, color = "black", weight = 1) %>%
+              leaflet::addRasterImage(fcover) 
+              })
+
+
+output$clicked_shape <- renderText({
+  req(input$map4_shape_click)
+  selected_point <- data.frame(x = input$map4_shape_click$lng, y = input$map4_shape_click$lat ) %>% 
+                     sf::st_as_sf(coords = c("x", "y"), crs = 4326) 
+
+index_of_polygon <- sf::st_intersects(selected_point, wards, sparse = T) %>% 
+                    as.numeric()
+
+glue::glue("You clicked on the ward of {wards$NAME[index_of_polygon]} which is in {wards$DISTRICT[index_of_polygon]}")
+  })
+
+
+output$mouseover_shape <- renderText({
+  req(input$map4_shape_mouseover)
+  selected_point <- data.frame(x = input$map4_shape_mouseover$lng, y = input$map4_shape_mouseover$lat ) %>% 
+                     sf::st_as_sf(coords = c("x", "y"), crs = 4326) 
+
+index_of_polygon <- sf::st_intersects(selected_point, wards, sparse = T) %>% 
+                    as.numeric()
+
+glue::glue("The mouse is over the ward of {wards$NAME[index_of_polygon]} which is in {wards$DISTRICT[index_of_polygon]}")
+  })
 ```
 
 ## UI layouts
+-   There are many different options for laying out the UI
+-   Sidebars, tabs, rows and columns
+-   Different components can be nested inside each other
+-   The examples in these pages need `layout.R` to be run separately (sorry!)
 
+## Sidebar layout
+::: columns
+::: {.column width="50%"}
+```{r echo=TRUE, eval=FALSE}
+fluidPage(
+  titlePanel(
+    # app title/description
+  ),
+  sidebarLayout(
+    sidebarPanel(
+      # inputs
+    ),
+    mainPanel(
+      # outputs
+    )
+  )
+)
+
+```
+::: 
+::: {.column width="50%"}
+```{r fig.height=8}
+par(cex = 2, mar=c(0,0,0,0))
+plot(0:400, 0:400, type="n", axes= F, ylab='', xlab='')
+rect(0, 0, 400, 400, col="firebrick1")
+text(50, 375,"fluidPage()")
+rect(25, 350, 375, 300, col="lightblue")
+text(75, 325, "titlePanel()")
+rect(25, 300, 375, 25, col="lightgreen")
+text(100, 275, "sidebarLayout()")
+rect(50, 250, 200, 50, col="pink")
+text(125, 225, "sidebarPanel()")
+rect(200, 250, 350, 50, col="orange")
+text(250, 225, "mainPanel()")
+```
+::: 
+::: 
+
+## Sidebar layout 
+
+```{=html}
+<iframe width="100%" height="100%" src="http://127.0.0.1:6110/?radio=1" ></iframe>
+```
+
+## Tab panels
+::: columns
+::: {.column width="30%"}
+
+```{r echo=TRUE, eval=FALSE}
+fluidPage(
+    titlePanel(
+  ),
+  tabsetPanel(
+    tabPanel( 
+      sidebarLayout(
+        sidebarPanel(
+        ),
+          mainPanel(
+          )
+        ),
+    tabPanel(),
+    tabPanel()
+  )
+ )
+)
+
+```
+::: 
+::: {.column width="70%"}
+
+```{r fig.height=8}
+par(cex = 1.8, mar=c(0,0,0,0))
+plot(0:400, 0:400, type="n", axes= F, ylab='', xlab='')
+rect(0, 0, 400, 400, col="firebrick1")
+text(50, 375,"fluidPage()")
+rect(25, 350, 375, 300, col="lightblue")
+text(75, 325, "titlePanel()")
+rect(25, 300, 375, 25, col="darkorchid1")
+text(90, 275, "tabsetPanel()")
+rect(50, 250, 350, 100, col="maroon2")
+text(100, 225, "tabPanel()")
+
+rect(75, 200, 325, 125, col="lightgreen")
+text(140, 185, "sidebarLayout()")
+rect(100, 170, 200, 130, col="pink")
+text(150, 150, "sidebarPanel()")
+rect(200, 170, 300, 130, col="orange")
+text(250, 150, "mainPanel()")
+
+rect(50, 90, 350, 50, col="maroon2")
+text(100, 70, "tabPanel()")
+
+```
+:::
+:::
+
+## Tab panels
+```{=html}
+<iframe width="100%" height="100%" src="http://127.0.0.1:6110/?radio=2" ></iframe>
+```
+
+
+## Fluid rows and columns
+
+-  Gives you more control over layout - the screen width is split into 12 units and you set their relative width
+
+::: columns
+::: {.column width="40%"}
+
+```{r echo=TRUE, eval=FALSE}
+ui <- fluidPage(
+  titlePanel(),
+  fluidRow(
+    column(width = 3,
+           ),
+    column(width = 6,
+           ),
+    column(width = 3,
+    )
+  )
+)
+
+```
+::: 
+::: {.column width="50%"}
+```{r fig.height=8}
+par(cex = 2, mar=c(0,0,0,0))
+plot(0:400, 0:400, type="n", axes= F, ylab='', xlab='')
+rect(0, 0, 400, 400, col="firebrick1")
+text(50, 375,"fluidPage()")
+rect(25, 350, 375, 300, col="lightblue")
+text(75, 325, "titlePanel()")
+rect(25, 300, 375, 25, col="darkorchid1")
+text(90, 275, "fluidRow()")
+rect(50, 250, 120, 50, col="palegreen")
+text(90, 225, "column()")
+rect(140, 250, 260, 50, col="palegreen")
+text(180, 225, "column()")
+rect(280, 250, 350, 50, col="palegreen")
+text(320, 225, "column()")
+```
+:::
+:::
+
+## Fluid row and columns
+
+```{=html}
+<iframe width="100%" height="100%" src="http://127.0.0.1:6110/?radio=3" ></iframe>
+```
+
+## Structuring UI code
+```{=html}
+<iframe width="100%" height="100%" src="http://127.0.0.1:6110/?radio=4" ></iframe>
+```
+
+## Structuring UI code
 -   Brackets are important for structuring layout of elements
--   Tabs and lines help to make your code readable
+-   Indentation and lines help to make your code readable
 -   It can get very complicated!
+
+```{r echo=TRUE, eval= FALSE}
+fluidPage(titlePanel("App title"),
+tabsetPanel(tabPanel("Tab 1",sidebarLayout(sidebarPanel(
+numericInput("number", "Pick a number", value = 10),
+selectInput("select", "Select an animal", choices = c("Cat", "Dog"))),
+mainPanel(plotOutput("plot"),tableOutput("table")))),
+tabPanel("Tab 2",fluidRow(column(width = 3,textInput("word", "Type a word"),
+sliderInput("slider", "Pick a value", min = 10, max = 100, value = 50)),
+column(width = 6,leafletOutput("map")),
+column(width = 3,checkboxInput("check", "Tick me")))),
+tabPanel("Tab 3",plotOutput("another_plot"))))
+```
+
+## Structuring UI code
+
+```{r echo=TRUE, eval= FALSE}
+
+fluidPage(
+  titlePanel("My fourth app"
+  ),
+  tabsetPanel(
+    tabPanel("Tab 1", 
+      sidebarLayout(
+        sidebarPanel(
+          numericInput("number", "Pick a number", value = 10),
+          selectInput("select", "Select an animal", choices = c("Cat", "Dog"))
+        ),
+          mainPanel(
+            plotOutput("plot"),
+            tableOutput("table")
+          )
+      )
+    ),
+    tabPanel("Tab 2",
+      fluidRow(
+        column(width = 3,
+          textInput("word", "Type a word"),
+          sliderInput("slider", "Pick a value", min = 10, max = 100, value = 50)
+        ),
+        column(width = 6,
+          leafletOutput("map")
+        ),
+        column(width = 3,
+           checkboxInput("check", "Tick me")
+        )
+      )
+    ),
+    tabPanel("Tab 3",
+      plotOutput("another_plot")
+    )
+  )
+)
+
+```
+
 
 ## Themes
 
@@ -813,6 +1268,7 @@ observe({
 ```{=html}
 <iframe width="1000" height="400" src="https://bootswatch.com/" title="Bootswatch"></iframe>
 ```
+
 ## Cascading style sheets
 
 -   css determines the appearance of elements on web pages
@@ -831,7 +1287,7 @@ ui <- fluidPage(
 ## File structures
 
 -   Various file structures can be used depending on complexity
--   Standalone as `app.R`
+-   Standalone as `app.R` (or `whatever_you_like.R`)
 -   Separate files for server and UI - `server.R` and `ui.R`
 -   `global.R` - loaded before `server.R` and `ui.R` so can be a good place to load data
 -   If `server.R` and `ui.R` become very long, code can be modularised into infinite files
@@ -841,23 +1297,19 @@ ui <- fluidPage(
 ## Common pitfalls
 
 -   Trying to use reactive objects in a non-reactive context
-
 -   Not appending reactive objects with `()` when accessing their values
-
 -   Naming a `reactive()` variable the same as a loaded function
-
 -   Typos in `input` or `output` IDs
-
 -   Using the same ID twice
-
 -   Misplaced brackets or commas in UI
 
 ## Debugging
 
+-   Sooner or later you are going to run into a problem
 -   Apps are run in their own environment, so you can't inspect objects in the Rstudio environment tab
 -   Run the code in a standard R script or .Rmd to check it works as you expect
 -   Use `verbatimTextOutput()` and `textOutput()` to display objects - are they in the state you expect?
--   Include `options(shiny.fullstacktrace = TRUE)` in the server
+-   Include `options(shiny.fullstacktrace = TRUE)` in the server 
 -   Add `browser()` above where your code is failing and then inspect the objects in your environment
 -   Create a simple app containing only the problematic elements (i.e. a minimal, reproducible example)
 
@@ -880,7 +1332,8 @@ ui <- fluidPage(
 
 ## How to deploy
 
--   Register: <https://www.shinyapps.io/auth/oauth/signup>
+-   Register: <https://www.shinyapps.io/auth/oauth/signup> 
+-   Your username will become part of the URL 
 -   Copy your token and secret: <https://www.shinyapps.io/admin/#/tokens>
 -   Click "Show" on right hand side and then "Show secret"
 -   Copy and run the code which looks like this:
@@ -891,9 +1344,16 @@ rsconnect::setAccountInfo(name='simonsmart',
 			  secret='kowe90erweioj2312iuj2o4ij2jij')
 ```
 
+## How to deploy 
+-  Run the app in Rstudio
+-  Click the "Publish" button in the top right corner
+-  Choose a URL for the app
+-  Click "Publish" again and wait
+
 ## Resources
 
 -   [Get started guide from Posit](https://shiny.posit.co/r/getstarted/)
+-   [Function reference](https://shiny.posit.co/r/reference/shiny/1.0.5/)
 -   [Mastering Shiny](https://mastering-shiny.org/)
 -   [Outstanding User Interfaces with Shiny](https://unleash-shiny.rinterface.com/)
 -   [Engineering Production-Grade Shiny Apps](https://engineering-shiny.org/)

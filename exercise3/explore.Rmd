@@ -18,7 +18,7 @@ districts <- wards %>%
 
 leaflet() %>%
   addProviderTiles("Esri.WorldTopoMap") %>%
-  addRasterImage(ras) %>%
+  addRasterImage(fcover) %>%
   addPolygons(data = wards, color = "black", weight = 1)
 
 
