@@ -5,7 +5,7 @@ library(leaflet)
 library(dplyr)
 
 fcover <- terra::rast("london_fcover.tif")
-wards <- sf::st_read("London_Ward.shp")
+wards <- sf::st_read("London_Ward.shp", quiet = TRUE)
 
 #reproject shapes to same CRS as the raster
 wards <- sf::st_transform(wards, crs(fcover))
@@ -28,9 +28,17 @@ ward_ids <- data.frame(id = 1:nrow(wards), ward = wards$NAME)
 ward_values <- merge(ward_values, ward_ids, by.x = "polygon", by.y = "id" )
 
 district_values <- terra::extract(fcover, districts, ID = TRUE, layer= TRUE, exact = TRUE)
+colnames(district_values ) <- c("polygon", "fcover", "fraction")
+district_ids <- data.frame(id = 1:nrow(districts), district = districts$DISTRICT)
+district_values <- merge(district_values, district_ids, by.x = "polygon", by.y = "id" )
+
+ward_summary <- ward_values %>% group_by(ward) %>% summarise(mean_fcover = (sum(fcover * fraction))/n())
+
+hist(ward_summary$mean_fcover)
 
 
-ward_fcover <- terra::crop(fcover, wards[wards$NAME == wards$NAME[1],])
+
+ward_fcover <- terra::crop(fcover, wards[wards$NAME == wards$NAME[1],], mask = TRUE)
 
 plot(ward_fcover)
 ```

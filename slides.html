@@ -540,7 +540,7 @@ color: green;
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">destfile =</span> <span class="st">"shinyworkshop.zip"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
-<li><code>install.packages(c("shiny","leaflet", "DT", "rsconnect"))</code></li>
+<li><code>install.packages(c("shiny","leaflet", "DT", "rsconnect", "sf", "terra"))</code></li>
 <li>For the slides to be interactive, you need to run <code>slides.qmd</code></li>
 </ul>
 </section>
@@ -967,7 +967,7 @@ Levels: setosa versicolor virginica</code></pre>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>min_petal_length <span class="ot">&lt;-</span> <span class="fu">min</span>(<span class="fu">df</span>()<span class="sc">$</span>Petal.Length)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="file-uploads" class="slide level2">
+<section id="file-uploads" class="slide level2 largecode">
 <h2>File uploads</h2>
 <ul>
 <li><code>fileInput()</code> uploads the file to the web server, but not into the R environment</li>
@@ -995,6 +995,8 @@ Levels: setosa versicolor virginica</code></pre>
 <span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  })</span>
 <span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>slider_value <span class="ot">&lt;-</span> <span class="fu">renderText</span>(input<span class="sc">$</span>slider)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<div class="columns">
+<div class="column" style="width:50%;">
 <div class="cell">
 <div class="cell-output-display">
 <br>
@@ -1005,11 +1007,19 @@ Levels: setosa versicolor virginica</code></pre>
 <input id="max_value" type="number" class="shiny-input-number form-control" value="10">
 </div>
 </div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<br>
+</div>
 <div class="cell-output-display">
 <div id="my_widget" class="shiny-html-output"></div>
 </div>
 <div class="cell-output-display">
 <div id="slider_value" class="shiny-text-output"></div>
+</div>
+</div>
 </div>
 </div>
 </section>
@@ -1030,6 +1040,8 @@ Levels: setosa versicolor virginica</code></pre>
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  )  </span>
 <span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<div class="columns">
+<div class="column" style="width:50%;">
 <div class="cell">
 <div class="cell-output-display">
 <br>
@@ -1040,6 +1052,12 @@ Levels: setosa versicolor virginica</code></pre>
 <input id="max_value2" type="number" class="shiny-input-number form-control" value="10">
 </div>
 </div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<br>
+</div>
 <div class="cell-output-display">
 <div class="form-group shiny-input-container">
 <label class="control-label" id="slider2-label" for="slider2">Value</label>
@@ -1048,6 +1066,8 @@ Levels: setosa versicolor virginica</code></pre>
 </div>
 <div class="cell-output-display">
 <div id="slider_value2" class="shiny-text-output"></div>
+</div>
+</div>
 </div>
 </div>
 </section>
@@ -1153,7 +1173,7 @@ Levels: setosa versicolor virginica</code></pre>
 <section id="using-actionbutton-and-bindevent" class="slide level2 largecode">
 <h2>Using <code>actionButton()</code> and <code>bindEvent()</code></h2>
 <ul>
-<li>Used to explicitly control when code is run</li>
+<li>Used to explicitly control when code is executed</li>
 </ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">actionButton</span>(<span class="st">"go"</span>, <span class="st">"Do stuff"</span>) <span class="co">#UI</span></span>
@@ -1251,39 +1271,6 @@ class G sout
 </div>
 </div>
 </section>
-<section id="applications-vs.-scripts" class="slide level2">
-<h2>Applications vs.&nbsp;scripts</h2>
-<ul>
-<li>Execution is circular, not linear</li>
-<li>You are creating a range of possibilities for your user</li>
-<li>Applications have users and users can break things</li>
-<li>What happens if you write this, but a user uploads a <code>.jpeg</code> instead of <code>.csv</code>?</li>
-<li>Need to try and consider all the possibilities and manage them</li>
-</ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fileInput</span>(<span class="st">"file"</span>, <span class="st">"Upload .csv file"</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">reactive</span>({<span class="fu">req</span>(input<span class="sc">$</span>file)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>                <span class="fu">read.csv</span>(input<span class="sc">$</span>file<span class="sc">$</span>datapath)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="applications-vs.-scripts-1" class="slide level2">
-<h2>Applications vs.&nbsp;scripts</h2>
-<ul>
-<li>Execution is circular, not linear</li>
-<li>You are creating a range of possibilities for your user</li>
-<li>Applications have users and users can break things</li>
-<li>What happens if you write this, but a user uploads a <code>.jpeg</code> instead of <code>.csv</code>?</li>
-<li>Need to try and consider all the possibilities and manage them</li>
-</ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fileInput</span>(<span class="st">"file"</span>, <span class="st">"Upload .csv file"</span>, <span class="at">accept =</span> <span class="st">".csv"</span>)</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">reactive</span>({<span class="fu">req</span>(input<span class="sc">$</span>file)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                ext <span class="ot">&lt;-</span> tools<span class="sc">::</span><span class="fu">file_ext</span>(input<span class="sc">$</span>file<span class="sc">$</span>datapath)</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                <span class="fu">validate</span>(<span class="fu">need</span>(ext <span class="sc">==</span> <span class="st">"csv"</span>), <span class="st">"Please upload a .csv file"</span>)</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                <span class="fu">read.csv</span>(input<span class="sc">$</span>file<span class="sc">$</span>datapath)  </span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
 <section id="downloads" class="slide level2">
 <h2>Downloads</h2>
 <ul>
@@ -1291,16 +1278,26 @@ class G sout
 <li><code>downloadHandler()</code> in the server</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">downloadButton</span>(<span class="st">"download_data"</span>)</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>download_data <span class="ot">&lt;-</span> <span class="fu">downloadHandler</span>(</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">filename =</span> <span class="cf">function</span>() {</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">paste</span>(<span class="st">"data.csv"</span>, <span class="at">sep=</span><span class="st">""</span>)</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">content =</span> <span class="cf">function</span>(file) {</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">write.csv</span>(data, file)</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">downloadButton</span>(<span class="st">"download_data"</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>download_data <span class="ot">&lt;-</span> <span class="fu">downloadHandler</span>(</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">filename =</span> <span class="cf">function</span>() {</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">paste</span>(<span class="st">"data.csv"</span>, <span class="at">sep=</span><span class="st">""</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">content =</span> <span class="cf">function</span>(file) {</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">write.csv</span>(data, file)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="downloads-1" class="slide level2">
+<h2>Downloads</h2>
+<ul>
+<li>Typically, you want to reuse a <code>reactive()</code> that you have used to create a table or a graph inside the <code>content</code> part of the download handler</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">reactive</span>(iris[iris<span class="sc">$</span>Sepal.Length <span class="sc">&lt;=</span> input<span class="sc">$</span>sepal_length])</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>plot <span class="ot">&lt;-</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="interactive-tables" class="slide level2">
@@ -1309,8 +1306,8 @@ class G sout
 <li>Datatables are created with <code>DT::renderDataTable()</code> in the server and <code>DT::dataTableOutput()</code> in the UI:</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">dataTableOutput</span>(<span class="st">"datatable"</span>) </span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>datatable <span class="ot">&lt;-</span> DT<span class="sc">::</span><span class="fu">renderDataTable</span>(iris) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">dataTableOutput</span>(<span class="st">"datatable"</span>) </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>datatable <span class="ot">&lt;-</span> DT<span class="sc">::</span><span class="fu">renderDataTable</span>(iris) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="cell-output-display">
@@ -1349,13 +1346,13 @@ class G sout
 <li><code>renderLeaflet()</code> for the server and <code>leafletOutput()</code> for the UI</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>map <span class="ot">&lt;-</span> <span class="fu">renderLeaflet</span>({</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">leaflet</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">addPolygons</span>(sf_object) <span class="sc">%&gt;%</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">addRasterImage</span>(raster_image) <span class="sc">%&gt;%</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">plet</span>(terra_object) <span class="co">#currently requires dev version: </span></span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>                              <span class="co">#remotes::install_github("rstudio/leaflet")</span></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>map <span class="ot">&lt;-</span> <span class="fu">renderLeaflet</span>({</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">leaflet</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">addPolygons</span>(sf_object) <span class="sc">%&gt;%</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">addRasterImage</span>(raster_image) <span class="sc">%&gt;%</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">plet</span>(terra_object) <span class="co">#currently requires dev version: </span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>                              <span class="co">#remotes::install_github("rstudio/leaflet")</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="an-example" class="slide level2">
@@ -1387,19 +1384,19 @@ class G sout
 <li><code>leafletProxy()</code> prevents completely re-drawing the map whenever something changes:</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>map <span class="ot">&lt;-</span> <span class="fu">renderLeaflet</span>({</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">leaflet</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">addPolygons</span>(sf_object)</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  })</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>proxy_map <span class="ot">&lt;-</span> <span class="fu">leafletProxy</span>(<span class="st">"map"</span>)</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="fu">observe</span>({</span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>    proxy_map <span class="sc">%&gt;%</span></span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">addRasterImage</span>(</span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>        terra<span class="sc">::</span><span class="fu">clamp</span>(</span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>          fcover, input<span class="sc">$</span>threshold, <span class="at">value =</span> <span class="cn">FALSE</span>))</span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>map <span class="ot">&lt;-</span> <span class="fu">renderLeaflet</span>({</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">leaflet</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">addPolygons</span>(sf_object)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>proxy_map <span class="ot">&lt;-</span> <span class="fu">leafletProxy</span>(<span class="st">"map"</span>)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="fu">observe</span>({</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    proxy_map <span class="sc">%&gt;%</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">addRasterImage</span>(</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>        terra<span class="sc">::</span><span class="fu">clamp</span>(</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>          fcover, input<span class="sc">$</span>threshold, <span class="at">value =</span> <span class="cn">FALSE</span>))</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="without-leafletproxy" class="slide level2">
@@ -1439,13 +1436,13 @@ class G sout
 <li>See the Inputs/Events section of <a href="https://rstudio.github.io/leaflet/shiny.html" class="uri">https://rstudio.github.io/leaflet/shiny.html</a></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>selected_shape <span class="ot">&lt;-</span> <span class="fu">renderText</span>({</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  selected_point <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> input<span class="sc">$</span>map_shape_click<span class="sc">$</span>lng, <span class="at">y =</span> input<span class="sc">$</span>map_shape_click<span class="sc">$</span>lat ) <span class="sc">%&gt;%</span> </span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                     sf<span class="sc">::</span><span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) </span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>index_of_polygon <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_intersects</span>(selected_point, wards, <span class="at">sparse =</span> T) <span class="sc">%&gt;%</span> </span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">as.numeric</span>()</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>glue<span class="sc">::</span><span class="fu">glue</span>(<span class="st">"You clicked on the ward of {wards$NAME[index_of_polygon]} which is in {wards$DISTRICT[index_of_polygon]}"</span>)</span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>selected_shape <span class="ot">&lt;-</span> <span class="fu">renderText</span>({</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  selected_point <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> input<span class="sc">$</span>map_shape_click<span class="sc">$</span>lng, <span class="at">y =</span> input<span class="sc">$</span>map_shape_click<span class="sc">$</span>lat ) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>                     sf<span class="sc">::</span><span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>index_of_polygon <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_intersects</span>(selected_point, wards, <span class="at">sparse =</span> T) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">as.numeric</span>()</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>glue<span class="sc">::</span><span class="fu">glue</span>(<span class="st">"You clicked on the ward of {wards$NAME[index_of_polygon]} which is in {wards$DISTRICT[index_of_polygon]}"</span>)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="accessing-information-from-the-map-1" class="slide level2">
@@ -1467,6 +1464,8 @@ class G sout
 <ul>
 <li>There are many different options for laying out the UI</li>
 <li>Sidebars, tabs, rows and columns</li>
+<li>Different components can be nested inside each other</li>
+<li>The examples in these pages need <code>layout.R</code> to be run separately (sorry!)</li>
 </ul>
 </section>
 <section id="sidebar-layout" class="slide level2">
@@ -1474,24 +1473,24 @@ class G sout
 <div class="columns">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fluidPage</span>(</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">titlePanel</span>(</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># app title/description</span></span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sidebarLayout</span>(</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sidebarPanel</span>(</span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>      <span class="co"># inputs</span></span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mainPanel</span>(</span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>      <span class="co"># outputs</span></span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fluidPage</span>(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">titlePanel</span>(</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># app title/description</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sidebarLayout</span>(</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sidebarPanel</span>(</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>      <span class="co"># inputs</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mainPanel</span>(</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>      <span class="co"># outputs</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-70-1.png" width="960"></p>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-71-1.png" width="960"></p>
 </div>
 </div>
 </div>
@@ -1506,27 +1505,27 @@ class G sout
 <div class="columns">
 <div class="column" style="width:30%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fluidPage</span>(</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">titlePanel</span>(</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tabsetPanel</span>(</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tabPanel</span>( </span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sidebarLayout</span>(</span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sidebarPanel</span>(</span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>          <span class="fu">mainPanel</span>(</span>
-<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>          )</span>
-<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tabPanel</span>(),</span>
-<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tabPanel</span>()</span>
-<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a> )</span>
-<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fluidPage</span>(</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">titlePanel</span>(</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tabsetPanel</span>(</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tabPanel</span>( </span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sidebarLayout</span>(</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sidebarPanel</span>(</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mainPanel</span>(</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tabPanel</span>(),</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tabPanel</span>()</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div><div class="column" style="width:70%;">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-72-1.png" width="960"></p>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-73-1.png" width="960"></p>
 </div>
 </div>
 </div>
@@ -1544,22 +1543,22 @@ class G sout
 <div class="columns">
 <div class="column" style="width:40%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">titlePanel</span>(),</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fluidRow</span>(</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">column</span>(<span class="at">width =</span> <span class="dv">3</span>,</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>           ),</span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">column</span>(<span class="at">width =</span> <span class="dv">6</span>,</span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>           ),</span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">column</span>(<span class="at">width =</span> <span class="dv">3</span>,</span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">titlePanel</span>(),</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fluidRow</span>(</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">column</span>(<span class="at">width =</span> <span class="dv">3</span>,</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">column</span>(<span class="at">width =</span> <span class="dv">6</span>,</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">column</span>(<span class="at">width =</span> <span class="dv">3</span>,</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-74-1.png" width="960"></p>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-75-1.png" width="960"></p>
 </div>
 </div>
 </div>
@@ -1569,64 +1568,68 @@ class G sout
 <h2>Fluid row and columns</h2>
 <iframe width="100%" height="100%" src="http://127.0.0.1:6110/?radio=3"></iframe>
 </section>
-<section id="structuring-code" class="slide level2">
-<h2>Structuring code</h2>
+<section id="structuring-ui-code" class="slide level2">
+<h2>Structuring UI code</h2>
+<iframe width="100%" height="100%" src="http://127.0.0.1:6110/?radio=4"></iframe>
+</section>
+<section id="structuring-ui-code-1" class="slide level2">
+<h2>Structuring UI code</h2>
 <ul>
 <li>Brackets are important for structuring layout of elements</li>
 <li>Indentation and lines help to make your code readable</li>
 <li>It can get very complicated!</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fluidPage</span>(<span class="fu">titlePanel</span>(<span class="st">"App title"</span>),</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tabsetPanel</span>(<span class="fu">tabPanel</span>(<span class="st">"Tab 1"</span>,<span class="fu">sidebarLayout</span>(<span class="fu">sidebarPanel</span>(</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">numericInput</span>(<span class="st">"number"</span>, <span class="st">"Pick a number"</span>, <span class="at">value =</span> <span class="dv">10</span>),</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="fu">selectInput</span>(<span class="st">"select"</span>, <span class="st">"Select an animal"</span>, <span class="at">choices =</span> <span class="fu">c</span>(<span class="st">"Cat"</span>, <span class="st">"Dog"</span>))),</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mainPanel</span>(<span class="fu">plotOutput</span>(<span class="st">"plot"</span>),<span class="fu">tableOutput</span>(<span class="st">"table"</span>)))),</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tabPanel</span>(<span class="st">"Tab 2"</span>,<span class="fu">fluidRow</span>(<span class="fu">column</span>(<span class="at">width =</span> <span class="dv">3</span>,<span class="fu">textInput</span>(<span class="st">"word"</span>, <span class="st">"Type a word"</span>),</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sliderInput</span>(<span class="st">"slider"</span>, <span class="st">"Pick a value"</span>, <span class="at">min =</span> <span class="dv">10</span>, <span class="at">max =</span> <span class="dv">100</span>, <span class="at">value =</span> <span class="dv">50</span>)),</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="fu">column</span>(<span class="at">width =</span> <span class="dv">6</span>,<span class="fu">leafletOutput</span>(<span class="st">"map"</span>)),</span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a><span class="fu">column</span>(<span class="at">width =</span> <span class="dv">3</span>,<span class="fu">checkboxInput</span>(<span class="st">"check"</span>, <span class="st">"Tick me"</span>)))),</span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tabPanel</span>(<span class="st">"Tab 3"</span>,<span class="fu">plotOutput</span>(<span class="st">"another_plot"</span>))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fluidPage</span>(<span class="fu">titlePanel</span>(<span class="st">"My fourth app"</span>),</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tabsetPanel</span>(<span class="fu">tabPanel</span>(<span class="st">"Tab 1"</span>,<span class="fu">sidebarLayout</span>(<span class="fu">sidebarPanel</span>(</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">numericInput</span>(<span class="st">"number"</span>, <span class="st">"Pick a number"</span>, <span class="at">value =</span> <span class="dv">10</span>),</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="fu">selectInput</span>(<span class="st">"select"</span>, <span class="st">"Select an animal"</span>, <span class="at">choices =</span> <span class="fu">c</span>(<span class="st">"Cat"</span>, <span class="st">"Dog"</span>))),</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mainPanel</span>(<span class="fu">plotOutput</span>(<span class="st">"plot"</span>),<span class="fu">tableOutput</span>(<span class="st">"table"</span>)))),</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tabPanel</span>(<span class="st">"Tab 2"</span>,<span class="fu">fluidRow</span>(<span class="fu">column</span>(<span class="at">width =</span> <span class="dv">3</span>,<span class="fu">textInput</span>(<span class="st">"word"</span>, <span class="st">"Type a word"</span>),</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sliderInput</span>(<span class="st">"slider"</span>, <span class="st">"Pick a value"</span>, <span class="at">min =</span> <span class="dv">10</span>, <span class="at">max =</span> <span class="dv">100</span>, <span class="at">value =</span> <span class="dv">50</span>)),</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="fu">column</span>(<span class="at">width =</span> <span class="dv">6</span>,<span class="fu">leafletOutput</span>(<span class="st">"map"</span>)),</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="fu">column</span>(<span class="at">width =</span> <span class="dv">3</span>,<span class="fu">checkboxInput</span>(<span class="st">"check"</span>, <span class="st">"Tick me"</span>)))),</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tabPanel</span>(<span class="st">"Tab 3"</span>,<span class="fu">plotOutput</span>(<span class="st">"another_plot"</span>))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="structuring-code-1" class="slide level2">
-<h2>Structuring code</h2>
+<section id="structuring-ui-code-2" class="slide level2">
+<h2>Structuring UI code</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fluidPage</span>(</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">titlePanel</span>(<span class="st">"My fourth app"</span></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tabsetPanel</span>(</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tabPanel</span>(<span class="st">"Tab 1"</span>, </span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sidebarLayout</span>(</span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sidebarPanel</span>(</span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>          <span class="fu">numericInput</span>(<span class="st">"number"</span>, <span class="st">"Pick a number"</span>, <span class="at">value =</span> <span class="dv">10</span>),</span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>          <span class="fu">selectInput</span>(<span class="st">"select"</span>, <span class="st">"Select an animal"</span>, <span class="at">choices =</span> <span class="fu">c</span>(<span class="st">"Cat"</span>, <span class="st">"Dog"</span>))</span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>          <span class="fu">mainPanel</span>(</span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>            <span class="fu">plotOutput</span>(<span class="st">"plot"</span>),</span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>            <span class="fu">tableOutput</span>(<span class="st">"table"</span>)</span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>          )</span>
-<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tabPanel</span>(<span class="st">"Tab 2"</span>,</span>
-<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>      <span class="fu">fluidRow</span>(</span>
-<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">column</span>(<span class="at">width =</span> <span class="dv">3</span>,</span>
-<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>          <span class="fu">textInput</span>(<span class="st">"word"</span>, <span class="st">"Type a word"</span>),</span>
-<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>          <span class="fu">sliderInput</span>(<span class="st">"slider"</span>, <span class="st">"Pick a value"</span>, <span class="at">min =</span> <span class="dv">10</span>, <span class="at">max =</span> <span class="dv">100</span>, <span class="at">value =</span> <span class="dv">50</span>)</span>
-<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>        <span class="fu">column</span>(<span class="at">width =</span> <span class="dv">6</span>,</span>
-<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>          <span class="fu">leafletOutput</span>(<span class="st">"map"</span>)</span>
-<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a>        <span class="fu">column</span>(<span class="at">width =</span> <span class="dv">3</span>,</span>
-<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a>           <span class="fu">checkboxInput</span>(<span class="st">"check"</span>, <span class="st">"Tick me"</span>)</span>
-<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tabPanel</span>(<span class="st">"Tab 3"</span>,</span>
-<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a>      <span class="fu">plotOutput</span>(<span class="st">"another_plot"</span>)</span>
-<span id="cb37-33"><a href="#cb37-33" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb37-34"><a href="#cb37-34" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb37-35"><a href="#cb37-35" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fluidPage</span>(</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">titlePanel</span>(<span class="st">"My fourth app"</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tabsetPanel</span>(</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tabPanel</span>(<span class="st">"Tab 1"</span>, </span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sidebarLayout</span>(</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sidebarPanel</span>(</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>          <span class="fu">numericInput</span>(<span class="st">"number"</span>, <span class="st">"Pick a number"</span>, <span class="at">value =</span> <span class="dv">10</span>),</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>          <span class="fu">selectInput</span>(<span class="st">"select"</span>, <span class="st">"Select an animal"</span>, <span class="at">choices =</span> <span class="fu">c</span>(<span class="st">"Cat"</span>, <span class="st">"Dog"</span>))</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mainPanel</span>(</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>          <span class="fu">plotOutput</span>(<span class="st">"plot"</span>),</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>          <span class="fu">tableOutput</span>(<span class="st">"table"</span>)</span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tabPanel</span>(<span class="st">"Tab 2"</span>,</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>      <span class="fu">fluidRow</span>(</span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">column</span>(<span class="at">width =</span> <span class="dv">3</span>,</span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>          <span class="fu">textInput</span>(<span class="st">"word"</span>, <span class="st">"Type a word"</span>),</span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>          <span class="fu">sliderInput</span>(<span class="st">"slider"</span>, <span class="st">"Pick a value"</span>, <span class="at">min =</span> <span class="dv">10</span>, <span class="at">max =</span> <span class="dv">100</span>, <span class="at">value =</span> <span class="dv">50</span>)</span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a>        <span class="fu">column</span>(<span class="at">width =</span> <span class="dv">6</span>,</span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a>          <span class="fu">leafletOutput</span>(<span class="st">"map"</span>)</span>
+<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a>        <span class="fu">column</span>(<span class="at">width =</span> <span class="dv">3</span>,</span>
+<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a>           <span class="fu">checkboxInput</span>(<span class="st">"check"</span>, <span class="st">"Tick me"</span>)</span>
+<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb36-31"><a href="#cb36-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tabPanel</span>(<span class="st">"Tab 3"</span>,</span>
+<span id="cb36-32"><a href="#cb36-32" aria-hidden="true" tabindex="-1"></a>      <span class="fu">plotOutput</span>(<span class="st">"another_plot"</span>)</span>
+<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb36-34"><a href="#cb36-34" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb36-35"><a href="#cb36-35" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="themes" class="slide level2">
@@ -1647,25 +1650,56 @@ class G sout
 <li>Often requires trial and error!</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  tags<span class="sc">$</span><span class="fu">head</span>(</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>      tags<span class="sc">$</span><span class="fu">style</span>(<span class="at">type=</span><span class="st">"text/css"</span>, </span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>                 <span class="st">".shiny-output-error-validation {color: green; font-size: 18px}"</span></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>      )))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  tags<span class="sc">$</span><span class="fu">head</span>(</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>      tags<span class="sc">$</span><span class="fu">style</span>(<span class="at">type=</span><span class="st">"text/css"</span>, </span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>                 <span class="st">".shiny-output-error-validation {color: green; font-size: 18px}"</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>      )))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="file-structures" class="slide level2">
 <h2>File structures</h2>
 <ul>
 <li>Various file structures can be used depending on complexity</li>
-<li>Standalone as <code>app.R</code></li>
+<li>Standalone as <code>app.R</code> (or <code>whatever_you_like.R</code>)</li>
 <li>Separate files for server and UI - <code>server.R</code> and <code>ui.R</code></li>
 <li><code>global.R</code> - loaded before <code>server.R</code> and <code>ui.R</code> so can be a good place to load data</li>
 <li>If <code>server.R</code> and <code>ui.R</code> become very long, code can be modularised into infinite files</li>
 </ul>
 </section>
-<section id="templates" class="slide level2">
-<h2>Templates</h2>
+<section id="applications-vs.-scripts" class="slide level2">
+<h2>Applications vs.&nbsp;scripts</h2>
+<ul>
+<li>Execution is circular, not linear</li>
+<li>You are creating a range of possibilities for your user</li>
+<li>Applications have users and users can break things</li>
+</ul>
+</section>
+<section id="applications-vs.-scripts-1" class="slide level2">
+<h2>Applications vs.&nbsp;scripts</h2>
+<ul>
+<li>Try and consider all the possibile ways a user could interact with your app and manage them</li>
+<li>e.g what happens if you write this, but a user uploads a <code>.jpeg</code> instead of <code>.csv</code>?</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fileInput</span>(<span class="st">"file"</span>, <span class="st">"Upload .csv file"</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">reactive</span>({<span class="fu">req</span>(input<span class="sc">$</span>file)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>                <span class="fu">read.csv</span>(input<span class="sc">$</span>file<span class="sc">$</span>datapath)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="applications-vs.-scripts-2" class="slide level2">
+<h2>Applications vs.&nbsp;scripts</h2>
+<ul>
+<li>Adding extra arguments to functions and using <code>validate(need())</code> can help:</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fileInput</span>(<span class="st">"file"</span>, <span class="st">"Upload .csv file"</span>, <span class="at">accept =</span> <span class="st">".csv"</span>)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">reactive</span>({<span class="fu">req</span>(input<span class="sc">$</span>file)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>                ext <span class="ot">&lt;-</span> tools<span class="sc">::</span><span class="fu">file_ext</span>(input<span class="sc">$</span>file<span class="sc">$</span>datapath)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>                <span class="fu">validate</span>(<span class="fu">need</span>(ext <span class="sc">==</span> <span class="st">"csv"</span>), <span class="st">"Please upload a .csv file"</span>)</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>                <span class="fu">read.csv</span>(input<span class="sc">$</span>file<span class="sc">$</span>datapath)  </span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>                })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="common-pitfalls" class="slide level2">
 <h2>Common pitfalls</h2>
@@ -1723,9 +1757,9 @@ class G sout
 <li>Copy and run the code which looks like this:</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>rsconnect<span class="sc">::</span><span class="fu">setAccountInfo</span>(<span class="at">name=</span><span class="st">'simonsmart'</span>,</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">token=</span><span class="st">'E72042914BFED931FDE0C96A1'</span>,</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">secret=</span><span class="st">'kowe90erweioj2312iuj2o4ij2jij'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>rsconnect<span class="sc">::</span><span class="fu">setAccountInfo</span>(<span class="at">name=</span><span class="st">'simonsmart'</span>,</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">token=</span><span class="st">'E72042914BFED931FDE0C96A1'</span>,</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">secret=</span><span class="st">'kowe90erweioj2312iuj2o4ij2jij'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="how-to-deploy-1" class="slide level2">
@@ -1767,7 +1801,7 @@ output$animal_photo <- renderUI({
   Dinosaur = '<a href="https://commons.wikimedia.org/wiki/User:Drow_male" style="font-size:10px;">Fernando Losada Rodríguez<\u002fa>',
   Whale = '<a href="https://commons.wikimedia.org/wiki/User:Joyofmuseums" style="font-size:10px;">Joyofmuseums<\u002fa>')
   
-  HTML(glue::glue('<img src="{url}" height="200px">{credit}'))
+  HTML(glue::glue('<img src="{url}" height="180px">{credit}'))
 })
 </script>
  
@@ -1833,7 +1867,7 @@ output$datatable <- DT::renderDataTable(iris, options = list(pageLength = 5))
  
 <script type="application/shiny-prerendered" data-context="server">
 output$datatable2 <- DT::renderDataTable(iris, options = list(pageLength = 5))
-output$selected_row <- renderText({glue::glue("You have selected rows: {input$datatable2_rows_selected}")})
+output$selected_row <- renderText({glue::glue("You have selected rows: {paste(input$datatable2_rows_selected, collapse = ' ')}")})
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
@@ -1852,11 +1886,14 @@ output$map <- leaflet::renderLeaflet({
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
+pal <- leaflet::colorBin("Greens", domain = c(0:100), na.color = "pink")
+
 output$map2 <- leaflet::renderLeaflet({
               leaflet::leaflet() %>%
               leaflet::addProviderTiles("Esri.WorldTopoMap") %>%
-              leaflet::addRasterImage(terra::clamp(fcover, input$thresh1 , value=FALSE)) %>%
-              leaflet::addPolygons(data = wards, color = "black", weight = 1)
+              leaflet::addRasterImage(terra::clamp(fcover, input$thresh1, value=FALSE), colors = pal) %>%
+              leaflet::addPolygons(data = wards, color = "black", weight = 1) %>%
+              leaflet::addLegend(position = "bottomright", pal = pal, values = terra::values(fcover), title = "FCover")
               })
 </script>
  
@@ -1872,7 +1909,8 @@ proxy_map <- leaflet::leafletProxy("map3")
 observe({
   req(!is.na(input$thresh2))
   proxy_map %>%
-    leaflet::addRasterImage(terra::clamp(fcover, input$thresh2 , value=FALSE)) 
+    leaflet::addRasterImage(terra::clamp(fcover, input$thresh2 , value=FALSE), colors = pal) %>%
+    leaflet::addLegend(position = "bottomright", pal = pal, values = terra::values(fcover), title = "FCover")
 })
 
 output$selected_shape <- renderText({
@@ -2089,7 +2127,7 @@ ojs_define <- function(..., .session = shiny::getDefaultReactiveDomain()) {
         autoPlayMedia: null,
 
         // Global override for preloading lazy-loaded iframes (null/true/false)
-        preloadIframes: false,
+        preloadIframes: true,
 
         // Number of milliseconds between automatically proceeding to the
         // next slide, disabled when set to 0, this value can be overwritten

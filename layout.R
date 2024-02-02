@@ -1,5 +1,6 @@
 
 ui <- fluidPage(
+  #css to hide radioButtons
   tags$head(
     tags$style(type="text/css", 
                ".shiny-options-group {display:none}"
@@ -10,14 +11,15 @@ ui <- fluidPage(
 
 server <- function(input, output, session){
   
+  #observer to extract radio parameter from url
   observe({
     query <- parseQueryString(session$clientData$url_search)
-    print(query)
     if (!is.null(query$radio)) {
       updateRadioButtons(session, "radio", selected = as.numeric(query$radio))
     }
   })
   
+  #render different UIs depending on the radio button selected via the URL
   output$ui <- renderUI({
     if (input$radio == 4){
     out <- tagList(

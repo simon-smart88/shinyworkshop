@@ -9,7 +9,7 @@ format:
     code-line-numbers: false
 server: shiny
 date: "7 February 2024"
-preload-iframes: false
+preload-iframes: true
 ---
 
 ## About me
@@ -105,7 +105,7 @@ library(leaflet)
 -   Trying to be broad but shallow so you know what's possible, rather than narrow but exhaustive
 -   Please interrupt: If you're not sure then someone else isn't
 -   Aiming for 50:50 me talking:you writing
--   Code examples are not always complete i.e. not all required arguments are used
+-   Code examples are not always complete i.e. not all required arguments are used 
 
 ## Overview for this morning
 
@@ -136,7 +136,7 @@ unzip(download.file(url = "t.ly/Y6ZDH",
                     destfile = "shinyworkshop.zip"))
 ```
 
-- `install.packages(c("shiny","leaflet", "DT", "rsconnect"))`
+- `install.packages(c("shiny","leaflet", "DT", "rsconnect", "sf", "terra"))`
 -   For the slides to be interactive, you need to run `slides.qmd`
 
 ```{r}
@@ -176,7 +176,7 @@ ui <- fluidPage()
 
 server <- function(input, output) {}
 
-shinyApp(ui = ui, server = server)
+shinyApp(ui, server)
 ```
 :::
 
@@ -259,7 +259,7 @@ server <- function(input, output) {
   output$name_out <- renderText(paste0("My name is ", input$name))
 }
 
-shinyApp(ui = ui, server = server)
+shinyApp(ui, server)
 ```
 
 ```{r}
@@ -270,7 +270,7 @@ textOutput("name_out")
 
 ```{r}
 #| context: server
-output$name_out <- renderText(paste0("My name is ",input$name))
+output$name_out <- renderText(paste0("My name is ", input$name))
 ```
 :::
 
@@ -340,50 +340,8 @@ output$animal_photo <- renderUI({
   Dinosaur = '<a href="https://commons.wikimedia.org/wiki/User:Drow_male" style="font-size:10px;">Fernando Losada Rodríguez</a>',
   Whale = '<a href="https://commons.wikimedia.org/wiki/User:Joyofmuseums" style="font-size:10px;">Joyofmuseums</a>')
   
-  HTML(glue::glue('<img src="{url}" height="200px">{credit}'))
+  HTML(glue::glue('<img src="{url}" height="180px">{credit}'))
 })
-```
-
-## Static code can be put in different places
-
-```{r eval = FALSE, echo = TRUE}
-df <- read.csv()
-
-ui <- fluidPage()
-
-server <- function(input, output) {
-  
-  df <- read.csv()
-  
-  output$output <- renderTable({
-    df <- read.csv()
-  })
-}  
-
-shinyApp(ui = ui, server = server)
-```
-
-## Static code can be put in different places
-
-```{r eval = FALSE, echo = TRUE}
-df <- read.csv()
-# run once when the app starts
-
-ui <- fluidPage()
-
-server <- function(input, output) {
-  
-  df <- read.csv()
-  # run whenever a new user uses the app
-  
-  output$output <- renderTable({
-    df <- read.csv()
-    # run whenever input$value changes
-    df <- df[df$column == input$value,]
-  })
-}  
-
-shinyApp(ui = ui, server = server)
 ```
 
 ## Shiny input widgets
@@ -465,13 +423,56 @@ ui <- fluidPage(
 -   Start simple and build complexity gradually
 -   If you don't already, use the F1 key to look at documentation
 
+## Static code can be put in different places
+
+```{r eval = FALSE, echo = TRUE}
+df <- read.csv()
+
+ui <- fluidPage()
+
+server <- function(input, output) {
+  
+  df <- read.csv()
+  
+  output$output <- renderTable({
+    df <- read.csv()
+  })
+}  
+
+shinyApp(ui = ui, server = server)
+```
+
+## Static code can be put in different places
+
+```{r eval = FALSE, echo = TRUE}
+df <- read.csv()
+# run once when the app starts
+
+ui <- fluidPage()
+
+server <- function(input, output) {
+  
+  df <- read.csv()
+  # run whenever a new user uses the app
+  
+  output$output <- renderTable({
+    df <- read.csv()
+    # run whenever input$value changes
+    df <- df[df$column == input$value,]
+  })
+}  
+
+shinyApp(ui = ui, server = server)
+```
+
 ## tidyverse peculiarities
 
 Unfortunately this will not work as you might expect:
 
 ```{r echo=TRUE, eval=FALSE}
 #UI
-selectInput("var", "Variable", choices = c("carat", "depth", "table", "price", "x", "y", "z"))
+selectInput("var", "Variable", choices = 
+              c("carat", "depth", "table", "price", "x", "y", "z"))
 numericInput("min", "Minimum", value = 1)
 
 #Server
@@ -529,7 +530,7 @@ df <- reactive(iris[iris$Species == input$species,])
 min_petal_length <- min(df()$Petal.Length)
 ```
 
-## File uploads
+## File uploads {.largecode}
 
 -   `fileInput()` uploads the file to the web server, but not into the R environment
 -   The resulting `input$` value is a dataframe containing `name`, `size`, `type` and `datapath` columns
@@ -556,12 +557,23 @@ output$my_widget <- renderUI({
 output$slider_value <- renderText(input$slider)
 ```
 
+::: columns
+::: {.column width="50%"}
 ```{r}
 br()
 numericInput("max_value", "Max value", value = 10)
+```
+::: 
+::: {.column width="50%"}
+
+```{r}
+br()
 uiOutput("my_widget")
 textOutput("slider_value")
+
 ```
+:::
+:::
 
 ```{r}
 #| context: server
@@ -584,13 +596,21 @@ observe({
   )  
 })
 ```
-
+::: columns
+::: {.column width="50%"}
 ```{r}
 br()
 numericInput("max_value2", "Max value", value = 10)
+```
+:::
+::: {.column width="50%"}
+```{r}
+br()
 sliderInput("slider2", "Value", value = 5, min = 1, 10)
 textOutput("slider_value2")
 ```
+:::
+:::
 
 ```{r}
 #| context: server
@@ -629,7 +649,6 @@ textInput("name1", "What is your name?")
 checkboxInput("check1", "Tick me!", value = FALSE)
 ```
 :::
-
 ::: {.column width="50%"}
 ```{r}
 br()
@@ -688,7 +707,7 @@ validate(need(input$name2 == "Simon", "Your name must be Simon"),
 
 ## Using `actionButton()` and `bindEvent()` {.largecode}
 
--   Used to explicitly control when code is run
+-   Used to explicitly control when code is executed
 
 ```{r echo = TRUE, eval = FALSE}
 actionButton("go", "Do stuff") #UI
@@ -771,37 +790,6 @@ class G sout
 :::
 :::
 
-## Applications vs. scripts
-
--   Execution is circular, not linear
--   You are creating a range of possibilities for your user
--   Applications have users and users can break things
--   What happens if you write this, but a user uploads a `.jpeg` instead of `.csv`?
--   Need to try and consider all the possibilities and manage them
-
-```{r echo=TRUE, eval=FALSE}
-fileInput("file", "Upload .csv file")
-df <- reactive({req(input$file)
-                read.csv(input$file$datapath)})
-```
-
-## Applications vs. scripts
-
--   Execution is circular, not linear
--   You are creating a range of possibilities for your user
--   Applications have users and users can break things
--   What happens if you write this, but a user uploads a `.jpeg` instead of `.csv`?
--   Need to try and consider all the possibilities and manage them
-
-```{r echo=TRUE, eval=FALSE}
-fileInput("file", "Upload .csv file", accept = ".csv")
-df <- reactive({req(input$file)
-                ext <- tools::file_ext(input$file$datapath)
-                validate(need(ext == "csv"), "Please upload a .csv file")
-                read.csv(input$file$datapath)  
-                })
-```
-
 ## Downloads
 -   `downloadButton()` in the UI
 -   `downloadHandler()` in the server
@@ -819,8 +807,27 @@ output$download_data <- downloadHandler(
 )
 ```
 
+## Downloads
+-  Typically, you want to reuse a `reactive()` that you have used to create a table or a graph inside the `content` part of the download handler
+
+```{r echo = TRUE, eval=FALSE}
+df <- reactive(iris[iris$Sepal.Length <= input$sepal_length,])
+output$plot <- renderPlot(plot(df()$Sepal.Length, df()$Sepal.Width))
+output$download_data <- downloadHandler(
+      filename = function() {
+      "your_plot.png")
+    },
+    content = function(file) {
+      png(file, width = 1000, height = 500)
+      plot(df()$Sepal.Length, df()$Sepal.Width)
+      dev.off()
+    }
+)
+```
+
 ## Interactive tables
 - Datatables are created with `DT::renderDataTable()` in the server and `DT::dataTableOutput()` in the UI:
+- For even fancier tables, check out `{reactable}` and `{gt}`
 
 ```{r echo = TRUE, eval=FALSE}
 DT::dataTableOutput("datatable") 
@@ -848,7 +855,7 @@ textOutput("selected_row")
 ```{r}
 #| context: server
 output$datatable2 <- DT::renderDataTable(iris, options = list(pageLength = 5))
-output$selected_row <- renderText({glue::glue("You have selected rows: {input$datatable2_rows_selected}")})
+output$selected_row <- renderText({glue::glue("You have selected rows: {paste(input$datatable2_rows_selected, collapse = ' ')}")})
 ```
 
 ## Exercise 3
@@ -864,7 +871,7 @@ output$selected_row <- renderText({glue::glue("You have selected rows: {input$da
 
 ```{r echo=TRUE, eval=FALSE}
 output$map <- renderLeaflet({
-  leaflet() %>%
+    leaflet() %>%
     addPolygons(sf_object) %>%
     addRasterImage(raster_image) %>%
     terra::plet(terra_object) #currently requires dev version: 
@@ -929,17 +936,20 @@ observe({
 
 ```{r}
 leafletOutput("map2")
-numericInput("thresh1", "Threshold", value = 50)
+numericInput("thresh1", "Threshold", value = 100)
 ```
 
 ```{r}
 #| context: server
 
+pal <- leaflet::colorBin("Greens", domain = c(0:100), na.color = "pink")
+
 output$map2 <- leaflet::renderLeaflet({
               leaflet::leaflet() %>%
               leaflet::addProviderTiles("Esri.WorldTopoMap") %>%
-              leaflet::addRasterImage(terra::clamp(fcover, input$thresh1 , value=FALSE)) %>%
-              leaflet::addPolygons(data = wards, color = "black", weight = 1)
+              leaflet::addRasterImage(terra::clamp(fcover, input$thresh1, value=FALSE), colors = pal) %>%
+              leaflet::addPolygons(data = wards, color = "black", weight = 1) %>%
+              leaflet::addLegend(position = "bottomright", pal = pal, values = terra::values(fcover), title = "FCover")
               })
 ```
 
@@ -947,7 +957,7 @@ output$map2 <- leaflet::renderLeaflet({
 
 ```{r}
 leafletOutput("map3")
-numericInput("thresh2", "Threshold", value = 50)
+numericInput("thresh2", "Threshold", value = 100)
 ```
 
 ```{r}
@@ -956,7 +966,8 @@ numericInput("thresh2", "Threshold", value = 50)
 output$map3 <- leaflet::renderLeaflet({
               leaflet::leaflet() %>%
               leaflet::addProviderTiles("Esri.WorldTopoMap") %>%
-              leaflet::addPolygons(data = wards, color = "black", weight = 1)
+              leaflet::addPolygons(data = wards, color = "black", weight = 1) %>%
+              leaflet::addLegend(position = "bottomright", pal = pal, values = terra::values(fcover), title = "FCover")
               })
 
 proxy_map <- leaflet::leafletProxy("map3")
@@ -964,7 +975,7 @@ proxy_map <- leaflet::leafletProxy("map3")
 observe({
   req(!is.na(input$thresh2))
   proxy_map %>%
-    leaflet::addRasterImage(terra::clamp(fcover, input$thresh2 , value=FALSE)) 
+    leaflet::addRasterImage(terra::clamp(fcover, input$thresh2 , value = FALSE), colors = pal) 
 })
 
 output$selected_shape <- renderText({
@@ -1009,7 +1020,7 @@ output$map4 <- leaflet::renderLeaflet({
               leaflet::leaflet() %>%
               leaflet::addProviderTiles("Esri.WorldTopoMap") %>%
               leaflet::addPolygons(data = wards, color = "black", weight = 1) %>%
-              leaflet::addRasterImage(fcover) 
+              leaflet::addRasterImage(fcover, colors = pal) 
               })
 
 
@@ -1093,20 +1104,20 @@ text(250, 225, "mainPanel()")
 
 ```{r echo=TRUE, eval=FALSE}
 fluidPage(
-    titlePanel(
+  titlePanel(
   ),
   tabsetPanel(
     tabPanel( 
       sidebarLayout(
         sidebarPanel(
         ),
-          mainPanel(
-          )
-        ),
+        mainPanel(
+        )
+      )
+    )
     tabPanel(),
     tabPanel()
   )
- )
 )
 
 ```
@@ -1157,9 +1168,9 @@ ui <- fluidPage(
   titlePanel(),
   fluidRow(
     column(width = 3,
-           ),
+    ),
     column(width = 6,
-           ),
+    ),
     column(width = 3,
     )
   )
@@ -1204,7 +1215,7 @@ text(320, 225, "column()")
 -   It can get very complicated!
 
 ```{r echo=TRUE, eval= FALSE}
-fluidPage(titlePanel("App title"),
+fluidPage(titlePanel("My fourth app"),
 tabsetPanel(tabPanel("Tab 1",sidebarLayout(sidebarPanel(
 numericInput("number", "Pick a number", value = 10),
 selectInput("select", "Select an animal", choices = c("Cat", "Dog"))),
@@ -1230,10 +1241,10 @@ fluidPage(
           numericInput("number", "Pick a number", value = 10),
           selectInput("select", "Select an animal", choices = c("Cat", "Dog"))
         ),
-          mainPanel(
-            plotOutput("plot"),
-            tableOutput("table")
-          )
+        mainPanel(
+          plotOutput("plot"),
+          tableOutput("table")
+        )
       )
     ),
     tabPanel("Tab 2",
@@ -1257,7 +1268,6 @@ fluidPage(
 )
 
 ```
-
 
 ## Themes
 
@@ -1292,7 +1302,33 @@ ui <- fluidPage(
 -   `global.R` - loaded before `server.R` and `ui.R` so can be a good place to load data
 -   If `server.R` and `ui.R` become very long, code can be modularised into infinite files
 
-## Templates
+## Applications vs. scripts
+
+-   Execution is circular, not linear
+-   You are creating a range of possibilities for your user
+-   Applications have users and users can break things
+
+## Applications vs. scripts
+-   Try and consider all the possibile ways a user could interact with your app and manage them
+-   e.g what happens if you write this, but a user uploads a `.jpeg` instead of `.csv`?
+
+```{r echo=TRUE, eval=FALSE}
+fileInput("file", "Upload .csv file")
+df <- reactive({req(input$file)
+                read.csv(input$file$datapath)})
+```
+
+## Applications vs. scripts
+- Adding extra arguments to functions and using `validate(need())` can help:
+
+```{r echo=TRUE, eval=FALSE}
+fileInput("file", "Upload .csv file", accept = ".csv")
+df <- reactive({req(input$file)
+                ext <- tools::file_ext(input$file$datapath)
+                validate(need(ext == "csv"), "Please upload a .csv file")
+                read.csv(input$file$datapath)  
+                })
+```
 
 ## Common pitfalls
 
