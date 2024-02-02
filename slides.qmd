@@ -56,7 +56,7 @@ width: 400px
 
 
 /*Datatable*/
-table {
+table.dataTable {
 font-size: 16px;
 }
 
@@ -97,7 +97,7 @@ library(leaflet)
 -   Background in plant sciences and agricultural science
 -   Latecomer to R, only started in 2018
 -   Software developer in Population Health Sciences at University of Leicester with Tim Lucas
--   Collaborating with Dave Redding on Disagapp for high resolution mapping of disease
+-   Collaborating with Dave Redding on Disagapp for high-resolution mapping of disease
 -   <https://github.com/simon-smart88>
 
 ## Workshop overview
@@ -140,6 +140,7 @@ unzip(download.file(url = "t.ly/Y6ZDH",
 -   For the slides to be interactive, you need to run `slides.qmd`
 
 ```{r}
+## These are commented out because they will break if 15 people try to load them at once!
 ## {data-menu-title="Tomvision"}
 ## {=html} 
 ##<iframe width="100%" height="100%" src="https://tomvision.shinyapps.io/tomvision/"</iframe>
@@ -231,7 +232,6 @@ textOutput("my_first_output")
 -   Similarly, any code that uses a value calculated from the input is also rerun
 -   Unlike in a normal R script, code isn't executed from top to bottom
 :::
-
 ::: {.column width="40%"}
 ```{mermaid}
 %%| fig-width: 4
@@ -300,7 +300,7 @@ ui <- fluidPage(selectInput("animal", "Choose your favourite animal",
 server <- function(input, output) {
   output$animal_name <- renderText({
     animal_names = list("Whale" = "Hope", "Dinosaur" = "Dippy")
-    paste0("Your favourite animal's name is ",animal_names[[input$animal]])})
+    paste0("Your favourite animal's name is ", animal_names[[input$animal]])})
 }
 
 shinyApp(ui = ui, server = server)
@@ -310,7 +310,7 @@ shinyApp(ui = ui, server = server)
 ::: {.column width="40%"}
 ```{r}
 br()
-selectInput("animal", "Choose your favourite animal", choices=c("", "Whale", "Dinosaur"))
+selectInput("animal", "Choose your favourite animal", choices = c("", "Whale", "Dinosaur"))
 ```
 :::
 
@@ -327,7 +327,7 @@ htmlOutput("animal_photo")
 #| context: server
  output$animal_name <- renderText({
     animal_names = list("Whale" = "Hope", "Dinosaur" = "Dippy")
-    paste0("Your favourite animal's name is ",animal_names[[input$animal]])
+    paste0("Your favourite animal's name is ", animal_names[[input$animal]])
     })
 
 output$animal_photo <- renderUI({
@@ -496,21 +496,16 @@ data <- reactive(diamonds[diamonds[[input$var]] > input$min,])
 
 ## Exercise 1
 
-Create an app where you:
-
--   Load data from `iris`
--   Filter the data in some way using `sliderInput()`, `numericInput()` or `selectInput()`
--   Display the filtered data using `renderTable()` and `tableOutput()`
-
-```{r}
-head(iris)[0:3,]
-unique(iris$Species)
-```
+-   Create an app where you:
+    -   Load data from `iris`
+    -   Filter the data in some way using `sliderInput()`, `numericInput()` or `selectInput()`
+    -   Display the filtered data using `renderTable()` and `tableOutput()`
+-   Rstudio automatically detects `shinyApp()` in a file and clicking on ![](images/run_app.png) will run the app 
 
 ## `reactive()`
 
 -   If you want to access an `input$` you must do so inside reactive objects
--   You have already done this - all the `render*` function are reactive
+-   You have already done this - all the `render*` functions are reactive
 -   If you want to create an object without making an output though, you need to wrap it inside `reactive()`
 -   The resultant object is a function, so you need to append `()` when you access the values
 
@@ -858,12 +853,6 @@ output$datatable2 <- DT::renderDataTable(iris, options = list(pageLength = 5))
 output$selected_row <- renderText({glue::glue("You have selected rows: {paste(input$datatable2_rows_selected, collapse = ' ')}")})
 ```
 
-## Exercise 3
-
--   UI layout
--   Leaflet
--   Download
-
 ## Interactive maps
 
 -   `{leaflet}` is a package for creating interactive maps
@@ -872,7 +861,7 @@ output$selected_row <- renderText({glue::glue("You have selected rows: {paste(in
 ```{r echo=TRUE, eval=FALSE}
 output$map <- renderLeaflet({
     leaflet() %>%
-    addPolygons(sf_object) %>%
+    addPolygons(data = sf_object) %>%
     addRasterImage(raster_image) %>%
     terra::plet(terra_object) #currently requires dev version: 
                               #remotes::install_github("rstudio/leaflet")
@@ -918,7 +907,7 @@ output$map <- leaflet::renderLeaflet({
 ```{r echo=TRUE, eval=FALSE}
 output$map <- renderLeaflet({
   leaflet() %>%
-    addPolygons(sf_object)
+    addPolygons(data = sf_object)
   })
 
 proxy_map <- leafletProxy("map")
@@ -936,13 +925,13 @@ observe({
 
 ```{r}
 leafletOutput("map2")
-numericInput("thresh1", "Threshold", value = 100)
+numericInput("thresh1", "Threshold", value = 0)
 ```
 
 ```{r}
 #| context: server
 
-pal <- leaflet::colorBin("Greens", domain = c(0:100), na.color = "pink")
+pal <- leaflet::colorBin("Greens", domain = c(0:100), na.color = "#00000000")
 
 output$map2 <- leaflet::renderLeaflet({
               leaflet::leaflet() %>%
@@ -957,7 +946,7 @@ output$map2 <- leaflet::renderLeaflet({
 
 ```{r}
 leafletOutput("map3")
-numericInput("thresh2", "Threshold", value = 100)
+numericInput("thresh2", "Threshold", value = 0)
 ```
 
 ```{r}
@@ -1047,6 +1036,13 @@ index_of_polygon <- sf::st_intersects(selected_point, wards, sparse = T) %>%
 glue::glue("The mouse is over the ward of {wards$NAME[index_of_polygon]} which is in {wards$DISTRICT[index_of_polygon]}")
   })
 ```
+
+## Exercise 3
+-   Use `{leaflet}` to select a ward or district of London and zoom when it is selected
+    - Select the area either fully through clicking, or use a `selectInput()`
+    - Set the zoom using `sf::st_bbox()` and `leaflet::fitBounds()`
+-   Use a `downloadHandler` to download a `.png` of the satellite imagery of just that area
+    - Use `terra::crop(mask = TRUE)`
 
 ## UI layouts
 -   There are many different options for laying out the UI
@@ -1272,7 +1268,7 @@ fluidPage(
 ## Themes
 
 -   Themes can be used to change the appearance of all the elements of an app in one go
--   `fluidPage(theme = bslib::bs_theme("<theme name>"))`
+-   `fluidPage(theme = bslib::bs_theme(bootswatch ="<theme name>"))`
 -   [bootswatch.com](https://bootswatch.com/)
 
 ```{=html}
@@ -1294,13 +1290,59 @@ ui <- fluidPage(
       )))
 ```
 
-## File structures
+## Exercise 4
+-   Add a UI layout and a theme the app you created in Exercise 3
+-   If time permits, add some more features:
+    - Name the file by the name of the ward/district
+    - Plot a histogram of the values of the ward
+    - A league table you of greenness where clicking on a row plots a shape
+    - Anything else!
+-   Deploy the app to shinyapps.io (coming up!)
 
+## File naming conventions for deployment
 -   Various file structures can be used depending on complexity
--   Standalone as `app.R` (or `whatever_you_like.R`)
+-   Standalone file as `app.R` - what we will use
 -   Separate files for server and UI - `server.R` and `ui.R`
 -   `global.R` - loaded before `server.R` and `ui.R` so can be a good place to load data
 -   If `server.R` and `ui.R` become very long, code can be modularised into infinite files
+
+## Deployment
+
+-   Publish your app so that others can use it
+-   We will use [shinyapps.io](https://shinyapps.io) run by Posit
+-   Free and easy to use but has limitations:
+    -   Only 1GB RAM on free tier which may not be enough to run models
+    -   Limited amount of use per month (25 hours)
+    -   Only 3-5 concurrent users 
+    -   No persistent data storage
+-   Many other options available - speak to IT
+
+## What happens when you deploy
+
+-   Copies the code from the app directory
+-   Uses `{renv}` to check your R version and what package versions the app uses
+-   Replicates the environment of your machine on their server
+-   R runs on their server and sends the results to the browser
+
+## How to deploy
+-   Register: <https://www.shinyapps.io/auth/oauth/signup> 
+-   Your username will become part of the URL 
+-   Copy your token and secret: <https://www.shinyapps.io/admin/#/tokens>
+-   Click "Show" on right hand side and then "Show secret"
+-   Copy and run the code which looks like this:
+
+```{r echo=TRUE, eval = FALSE}
+rsconnect::setAccountInfo(name='simonsmart',
+			  token='E72042914BFED931FDE0C96A1',
+			  secret='kowe90erweioj2312iuj2o4ij2jij')
+```
+
+## How to deploy 
+-  Rename `exercise3.R` to `app.R`
+-  Run the `app.R` in Rstudio
+-  Click the "Publish" button in the top right corner
+-  Choose a URL for the app
+-  Click "Publish" again and wait
 
 ## Applications vs. scripts
 
@@ -1309,8 +1351,8 @@ ui <- fluidPage(
 -   Applications have users and users can break things
 
 ## Applications vs. scripts
--   Try and consider all the possibile ways a user could interact with your app and manage them
--   e.g what happens if you write this, but a user uploads a `.jpeg` instead of `.csv`?
+-   Try and consider all the possible ways a user could interact with your app and manage them
+-   e.g. what happens if you write this, but a user uploads a `.jpeg` instead of `.csv`?
 
 ```{r echo=TRUE, eval=FALSE}
 fileInput("file", "Upload .csv file")
@@ -1349,47 +1391,15 @@ df <- reactive({req(input$file)
 -   Add `browser()` above where your code is failing and then inspect the objects in your environment
 -   Create a simple app containing only the problematic elements (i.e. a minimal, reproducible example)
 
-## Deployment
-
--   Publish your app so that others can use it
--   We will use [shinyapps.io](https://shinyapps.io) run by Posit
--   Free and easy to use but has limitations:
-    -   Only 1GB RAM on free tiers which may not be enough to run models
-    -   Limited amount of use per month (25 hours)
-    -   No persistent data storage
--   Many other options available
-
-## What happens when you deploy
-
--   Copies the code from the app directory
--   Uses `{renv}` to check your R version and what package versions the app uses
--   Replicates the environment of your machine on their server
--   R runs on their server and sends the results to the browser
-
-## How to deploy
-
--   Register: <https://www.shinyapps.io/auth/oauth/signup> 
--   Your username will become part of the URL 
--   Copy your token and secret: <https://www.shinyapps.io/admin/#/tokens>
--   Click "Show" on right hand side and then "Show secret"
--   Copy and run the code which looks like this:
-
-```{r echo=TRUE, eval = FALSE}
-rsconnect::setAccountInfo(name='simonsmart',
-			  token='E72042914BFED931FDE0C96A1',
-			  secret='kowe90erweioj2312iuj2o4ij2jij')
-```
-
-## How to deploy 
--  Run the app in Rstudio
--  Click the "Publish" button in the top right corner
--  Choose a URL for the app
--  Click "Publish" again and wait
-
 ## Resources
 
 -   [Get started guide from Posit](https://shiny.posit.co/r/getstarted/)
--   [Function reference](https://shiny.posit.co/r/reference/shiny/1.0.5/)
+-   [Shiny functions reference](https://shiny.posit.co/r/reference/shiny/1.0.5/)
 -   [Mastering Shiny](https://mastering-shiny.org/)
 -   [Outstanding User Interfaces with Shiny](https://unleash-shiny.rinterface.com/)
 -   [Engineering Production-Grade Shiny Apps](https://engineering-shiny.org/)
+
+## Keep in touch
+-   Please send me links to your creations!
+-   I'm happy to help if you are really stuck
+-   <ss1545@le.ac.uk>
