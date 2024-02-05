@@ -76,13 +76,13 @@ color: green;
 /*mermaid-diagrams*/
 /*input, server, output*/
 .sin > rect {
-    fill: #81c9db !important;
+    fill: #b5e9ec !important;
 }
 .sser > rect {
-    fill: #81db93 !important;
+    fill: #b5ecb6 !important;
 }
 .sout > rect {
-    fill: #9381db !important;
+    fill: #d6b5ec !important;
 }
 
 
@@ -106,6 +106,7 @@ library(leaflet)
 -   Please interrupt: If you're not sure then someone else isn't
 -   Aiming for 50:50 me talking:you writing
 -   Code examples are not always complete i.e. not all required arguments are used 
+-   Natalie can help with Shiny, Tim with general R
 
 ## Overview for this morning
 
@@ -190,15 +191,30 @@ shinyApp(ui, server)
 
 -   Our job is to make these objects talk to each other
 
-## Communication between the UI and server
-
+## Communication between the UI and server {.smaller}
+::: columns
+::: {.column width="60%"}
 -   The server function takes two `list()`-like objects as arguments:
     -   `input$` where settings made in the UI are stored
         -   Created for you by objects in the UI
         -   Values are read-only
     -   `output$` where objects created in the server that need to be displayed in the UI are stored
         -   You create them
+:::
+::: {.column width="40%"}
+```{mermaid}
+%%| fig-width: 4
+%%| fig-height: 5
+flowchart TD
+A[Input in UI] --> |input$| B([Computation in server])
+B --> |output$| C(Output in UI)
 
+class A sin
+class B sser
+class C sout
+```
+:::
+:::
 ## Input and output IDs {.largecode}
 
 -   The objects in `input$` and `output$` have an ID used to refer to them
@@ -224,7 +240,6 @@ textOutput("my_first_output")
 -   Both are referenced as strings in the UI but as variables in the server
 
 ## Reactivity basics
-
 ::: columns
 ::: {.column width="60%"}
 -   Code in the server function is *reactive*
@@ -273,7 +288,6 @@ textOutput("name_out")
 output$name_out <- renderText(paste0("My name is ", input$name))
 ```
 :::
-
 ::: {.column width="30%"}
 ```{mermaid}
 %%| fig-width: 3
@@ -289,6 +303,52 @@ class C sout
 ```
 :::
 :::
+
+## Shiny input widgets
+
+::: columns
+::: {.column width="30%"}
+```{r eval = FALSE, echo = TRUE}
+actionButton()
+checkboxInput()
+dateInput()
+dateRangeInput()
+fileInput()
+numericInput()
+radioButtons()
+selectInput()
+sliderInput()
+textInput()
+```
+:::
+
+::: {.column width="70%"}
+![](images/basic-widgets.png){height="400px"}
+:::
+:::
+
+Source: <https://shiny.posit.co/r/getstarted/shiny-basics/lesson3/>
+
+```{r}
+##  {background-iframe="https://gallery.shinyapps.io/081-widgets-gallery/" background-interactive="true"}
+```
+
+## Output functions
+
+Outputs are generated in the server using `render*` functions and displayed in the UI using `*Output` functions
+
+| Data type         | Render function     |     Output function |
+|-------------------|---------------------|--------------------:|
+| Table             | `renderTable()`     |     `tableOutput()` |
+| Plot              | `renderPlot()`      |      `plotOutput()` |
+| Text              | `renderText()`      |      `textOutput()` |
+| Image             | `renderImage()`     |     `imageOutput()` |
+| Interactive table | `renderDataTable()` | `dataTableOutput()` |
+
+## Curly bracket syntax
+
+-   Typically `render*()` functions are used with curly brackets `{}` inside the function
+-   This lets you write multiple lines of code, but only the last line is returned
 
 ## Another example
 
@@ -344,52 +404,6 @@ output$animal_photo <- renderUI({
 })
 ```
 
-## Shiny input widgets
-
-::: columns
-::: {.column width="30%"}
-```{r eval = FALSE, echo = TRUE}
-actionButton()
-checkboxInput()
-dateInput()
-dateRangeInput()
-fileInput()
-numericInput()
-radioButtons()
-selectInput()
-sliderInput()
-textInput()
-```
-:::
-
-::: {.column width="70%"}
-![](images/basic-widgets.png){height="400px"}
-:::
-:::
-
-Source: <https://shiny.posit.co/r/getstarted/shiny-basics/lesson3/>
-
-```{r}
-##  {background-iframe="https://gallery.shinyapps.io/081-widgets-gallery/" background-interactive="true"}
-```
-
-## Output functions
-
-Outputs are generated in the server using `render*` functions and displayed in the UI using `*Output` functions
-
-| Data type         | Render function     |     Output function |
-|-------------------|---------------------|--------------------:|
-| Table             | `renderTable()`     |     `tableOutput()` |
-| Plot              | `renderPlot()`      |      `plotOutput()` |
-| Text              | `renderText()`      |      `textOutput()` |
-| Image             | `renderImage()`     |     `imageOutput()` |
-| Interactive table | `renderDataTable()` | `dataTableOutput()` |
-
-## Curly bracket syntax
-
--   Typically `render*()` functions are used with curly brackets `{}` inside the function
--   This lets you write multiple lines of code, but only the last line is returned
-
 ## UI development {.largecode}
 
 ::: columns
@@ -434,7 +448,7 @@ server <- function(input, output) {
   
   df <- read.csv()
   
-  output$output <- renderTable({
+  output$table <- renderTable({
     df <- read.csv()
   })
 }  
@@ -455,7 +469,7 @@ server <- function(input, output) {
   df <- read.csv()
   # run whenever a new user uses the app
   
-  output$output <- renderTable({
+  output$table <- renderTable({
     df <- read.csv()
     # run whenever input$value changes
     df <- df[df$column == input$value,]
@@ -476,7 +490,7 @@ selectInput("var", "Variable", choices =
 numericInput("min", "Minimum", value = 1)
 
 #Server
-data <- reactive(diamonds %>% filter(input$var > input$min))
+output$table <- renderTable(diamonds %>% filter(input$var > input$min))
 ```
 
 ## tidyverse peculiarities
@@ -484,14 +498,14 @@ data <- reactive(diamonds %>% filter(input$var > input$min))
 -   This is the correct syntax:
 
 ```{r echo=TRUE, eval=FALSE}
-data <- reactive(diamonds %>% filter(.data[[input$var]] > .env$input$min))
+output$table <- renderTable(diamonds %>% filter(.data[[input$var]] > .env$input$min))
 ```
 
 -   See [Mastering Shiny](https://mastering-shiny.org/action-tidy.html) for more details
 -   For now, just use the old-fashioned method:
 
 ```{r echo=TRUE, eval=FALSE}
-data <- reactive(diamonds[diamonds[[input$var]] > input$min,])
+output$table <- renderTable(diamonds[diamonds[[input$var]] > input$min,])
 ```
 
 ## Exercise 1
@@ -524,6 +538,8 @@ min_petal_length <- min(df$Petal.Length)
 df <- reactive(iris[iris$Species == input$species,])
 min_petal_length <- min(df()$Petal.Length)
 ```
+
+- Just like the `render*` functions, you can make these multi-line using `{}`
 
 ## File uploads {.largecode}
 
@@ -861,6 +877,7 @@ output$selected_row <- renderText({glue::glue("You have selected rows: {paste(in
 ```{r echo=TRUE, eval=FALSE}
 output$map <- renderLeaflet({
     leaflet() %>%
+    addProviderTiles("Esri.WorldTopoMap") %>%
     addPolygons(data = sf_object) %>%
     addRasterImage(raster_image) %>%
     terra::plet(terra_object) #currently requires dev version: 
@@ -876,8 +893,8 @@ leafletOutput("map")
 
 ```{r}
 #| context: server
-fcover <- terra::rast("exercise3/london_fcover.tif")
-wards <- sf::st_read("exercise3/London_Ward.shp")
+fcover <- terra::rast("exercise3/London_fcover_2023-06-10.tif")
+wards <- sf::st_read("exercise3/London_Ward.shp", quiet = TRUE)
 
 #reproject shapes to same CRS as the raster
 wards <- sf::st_transform(wards, terra::crs(fcover))
@@ -896,7 +913,7 @@ output$map <- leaflet::renderLeaflet({
     - legends - `addLegend()`
     - symbols - `addMarkers()`
     - pop-ups - `addPopups()`
-    - zooming - `setView()`
+    - zooming - `setView()` and `fitBounds()`
     - controlling visible layers- `addLayersControl()`
 -   `{leaflet.extras}` has tools for drawing shapes on the map which can be used to edit data
 
@@ -935,8 +952,8 @@ pal <- leaflet::colorBin("Greens", domain = c(0:100), na.color = "#00000000")
 
 output$map2 <- leaflet::renderLeaflet({
               leaflet::leaflet() %>%
-              leaflet::addProviderTiles("Esri.WorldTopoMap") %>%
-              leaflet::addRasterImage(terra::clamp(fcover, input$thresh1, value=FALSE), colors = pal) %>%
+              leaflet::addProviderTiles("Esri.WorldImagery") %>%
+              leaflet::addRasterImage(terra::clamp(fcover, input$thresh1, value=FALSE), colors = pal, opacity = 0.7) %>%
               leaflet::addPolygons(data = wards, color = "black", weight = 1) %>%
               leaflet::addLegend(position = "bottomright", pal = pal, values = terra::values(fcover), title = "FCover")
               })
@@ -954,7 +971,7 @@ numericInput("thresh2", "Threshold", value = 0)
 
 output$map3 <- leaflet::renderLeaflet({
               leaflet::leaflet() %>%
-              leaflet::addProviderTiles("Esri.WorldTopoMap") %>%
+              leaflet::addProviderTiles("Esri.WorldImagery") %>%
               leaflet::addPolygons(data = wards, color = "black", weight = 1) %>%
               leaflet::addLegend(position = "bottomright", pal = pal, values = terra::values(fcover), title = "FCover")
               })
@@ -964,18 +981,8 @@ proxy_map <- leaflet::leafletProxy("map3")
 observe({
   req(!is.na(input$thresh2))
   proxy_map %>%
-    leaflet::addRasterImage(terra::clamp(fcover, input$thresh2 , value = FALSE), colors = pal) 
+    leaflet::addRasterImage(terra::clamp(fcover, input$thresh2 , value = FALSE), colors = pal, opacity = 0.7) 
 })
-
-output$selected_shape <- renderText({
-  selected_point <- data.frame(x = input$map3_shape_click$lng, y = input$map3_shape_click$lat ) %>% 
-                     sf::st_as_sf(coords = c("x", "y"), crs = 4326) 
-
-index_of_polygon <- sf::st_intersects(selected_point, wards, sparse = T) %>% 
-                    as.numeric()
-
-glue::glue("You clicked on the ward of {wards$NAME[index_of_polygon]} which is in {wards$DISTRICT[index_of_polygon]}")
-  })
 
 ```
 
@@ -1039,7 +1046,7 @@ glue::glue("The mouse is over the ward of {wards$NAME[index_of_polygon]} which i
 
 ## Exercise 3
 -   Use `{leaflet}` to select a ward or district of London and zoom when it is selected
-    - Select the area either fully through clicking, or use a `selectInput()`
+    - Select the area either through clicking, or use a `selectInput()`
     - Set the zoom using `sf::st_bbox()` and `leaflet::fitBounds()`
 -   Use a `downloadHandler` to download a `.png` of the satellite imagery of just that area
     - Use `terra::crop(mask = TRUE)`
@@ -1295,7 +1302,7 @@ ui <- fluidPage(
 -   If time permits, add some more features:
     - Name the file by the name of the ward/district
     - Plot a histogram of the values of the ward
-    - A league table you of greenness where clicking on a row plots a shape
+    - A league table of greenness where clicking on a row zooms to the ward
     - Anything else!
 -   Deploy the app to shinyapps.io (coming up!)
 

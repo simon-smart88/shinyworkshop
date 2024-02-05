@@ -1,8 +1,10 @@
+library(shiny)
+library(leaflet)
 
 ui <- fluidPage(
   #css to hide radioButtons
   tags$head(
-    tags$style(type="text/css", 
+    tags$style(type="text/css",
                ".shiny-options-group {display:none}"
     )),
   radioButtons("radio","", choices = c(1:4)),
@@ -10,7 +12,7 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session){
-  
+
   #observer to extract radio parameter from url
   observe({
     query <- parseQueryString(session$clientData$url_search)
@@ -18,7 +20,7 @@ server <- function(input, output, session){
       updateRadioButtons(session, "radio", selected = as.numeric(query$radio))
     }
   })
-  
+
   #render different UIs depending on the radio button selected via the URL
   output$ui <- renderUI({
     if (input$radio == 4){
@@ -26,7 +28,7 @@ server <- function(input, output, session){
     titlePanel("My fourth app"
   ),
     tabsetPanel(
-      tabPanel("Tab 1", 
+      tabPanel("Tab 1",
                sidebarLayout(
                  sidebarPanel(
                    numericInput("number", "Pick a number", value = 10),
@@ -56,7 +58,7 @@ server <- function(input, output, session){
                plotOutput("another_plot")
       )
     ))}
-    
+
     if (input$radio == 1){
       out <- tagList(
         titlePanel(
@@ -71,7 +73,7 @@ server <- function(input, output, session){
           )
         )
       )
-    
+
     }
     if (input$radio == 2){
       out <- tagList(
@@ -91,12 +93,14 @@ server <- function(input, output, session){
             tabPanel("Tab 2",
                      plotOutput("another_plot")
                      ),
-            tabPanel("Tab 3")
+            tabPanel("Tab 3",
+                     leafletOutput("map")
+                     )
 
         )
       )
     }
-    
+
     if (input$radio == 3){
       out <- tagList(
         titlePanel( "My third app"),
@@ -115,9 +119,22 @@ server <- function(input, output, session){
     }
     out
 })
-  
+
   output$plot <- renderPlot(plot(iris$Sepal.Length, iris$Sepal.Width))
   output$another_plot <- renderPlot(plot(iris$Petal.Length, iris$Petal.Width))
+
+  fcover <- terra::rast("exercise3/London_fcover_2023-06-10.tif")
+  wards <- sf::st_read("exercise3/London_Ward.shp", quiet = TRUE)
+
+  #reproject shapes to same CRS as the raster
+  wards <- sf::st_transform(wards, terra::crs(fcover))
+
+  output$map <- leaflet::renderLeaflet({
+    leaflet::leaflet() %>%
+      leaflet::addProviderTiles("Esri.WorldTopoMap") %>%
+      leaflet::addRasterImage(fcover) %>%
+      leaflet::addPolygons(data = wards, color = "black", weight = 1)
+  })
 }
 
 shinyApp(ui, server, options = list(port = 6110))

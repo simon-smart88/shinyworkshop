@@ -4,11 +4,12 @@ library(sf)
 library(leaflet)
 library(dplyr)
 
-fcover <- terra::rast("london_fcover.tif")
+#read in data
+fcover <- terra::rast("London_fcover_2023-06-10.tif") #see below for downloading this
 wards <- sf::st_read("London_Ward.shp", quiet = TRUE)
 
 #reproject shapes to same CRS as the raster
-wards <- sf::st_transform(wards, crs(fcover))
+wards <- sf::st_transform(wards, terra::crs(fcover))
 
 #combine wards into districts
 districts <- wards %>% 
@@ -43,4 +44,46 @@ bbox <- sf::st_bbox(wards)
 
 
 ```
+
+```{r}
+#Download fcover for London
+
+#The data are only available at 10-day intervals
+date <- "2023-06-10"
+
+bbox <- sf::st_bbox(wards)
+
+#add a 0.1 degree buffer
+bbox[1:2] <- bbox[1:2] - 0.1
+bbox[3:4] <- bbox[3:4] + 0.1
+
+#convert the bounding box into a string
+bbox_str <- paste(bbox[[2]], bbox[[1]], bbox[[4]], bbox[[3]], sep = ",")
+
+#calculate polygon height and width
+#extract geometry
+top_left <- c(bbox[[1]], bbox[[4]])
+top_right <- c(bbox[[3]], bbox[[4]])
+bottom_left <- c(bbox[[1]], bbox[[2]])
+
+width <- geosphere::distm(top_left, top_right, fun = geosphere::distHaversine)
+height <- geosphere::distm(top_left, bottom_left, fun = geosphere::distHaversine)
+
+#convert to 333 m pixels
+height <- as.numeric(round(height / 333, 0))
+width <- as.numeric(round(width / 333, 0))
+
+#add date, width, height and bbox to the url
+url <- glue::glue("/vsicurl/https://viewer.globalland.vgt.vito.be/geoserver/wms?SERVICE=WMS&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image/geotiff&LAYERS=CGLS:fcover300_v1_333m&TILED=true&TIME={date}T00:00:00.000Z&WIDTH={width}&HEIGHT={height}&CRS=EPSG:4326&BBOX={bbox_str}")
+
+#request the data
+raster_image <- terra::rast(url)
+
+#remove missing values and rescale data to 0 - 100 %
+raster_image <- terra::clamp(raster_image, upper = 250, value = FALSE) / 2.5
+  
+terra::writeRaster(raster_image, "London_fcover_2023-06-10.tif")
+
+```
+
 

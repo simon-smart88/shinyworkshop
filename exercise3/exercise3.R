@@ -10,7 +10,7 @@ ui <- fluidPage(
 server <- function(input, output) {
 
   #load in data
-  fcover <- terra::rast("london_fcover.tif")
+  fcover <- terra::rast("London_fcover_2023-06-10.tif")
   wards <- sf::st_read("London_Ward.shp", quiet = TRUE)
 
   #reproject shapes to same CRS as the raster

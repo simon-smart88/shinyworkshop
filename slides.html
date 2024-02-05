@@ -475,13 +475,13 @@ color: green;
 /*mermaid-diagrams*/
 /*input, server, output*/
 .sin > rect {
-    fill: #81c9db !important;
+    fill: #b5e9ec !important;
 }
 .sser > rect {
-    fill: #81db93 !important;
+    fill: #b5ecb6 !important;
 }
 .sout > rect {
-    fill: #9381db !important;
+    fill: #d6b5ec !important;
 }
 
 
@@ -502,6 +502,7 @@ color: green;
 <li>Please interrupt: If you’re not sure then someone else isn’t</li>
 <li>Aiming for 50:50 me talking:you writing</li>
 <li>Code examples are not always complete i.e.&nbsp;not all required arguments are used</li>
+<li>Natalie can help with Shiny, Tim with general R</li>
 </ul>
 </section>
 <section id="overview-for-this-morning" class="slide level2">
@@ -578,8 +579,10 @@ color: green;
 <li>Our job is to make these objects talk to each other</li>
 </ul>
 </section>
-<section id="communication-between-the-ui-and-server" class="slide level2">
+<section id="communication-between-the-ui-and-server" class="slide level2 smaller">
 <h2>Communication between the UI and server</h2>
+<div class="columns">
+<div class="column" style="width:60%;">
 <ul>
 <li>The server function takes two <code>list()</code>-like objects as arguments:
 <ul>
@@ -594,6 +597,25 @@ color: green;
 </ul></li>
 </ul></li>
 </ul>
+</div><div class="column" style="width:40%;">
+<div class="cell" data-reveal="true" data-fig-width="4" data-fig-height="5">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+A[Input in UI] --&gt; |input$| B([Computation in server])
+B --&gt; |output$| C(Output in UI)
+
+class A sin
+class B sser
+class C sout
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section id="input-and-output-ids" class="slide level2 largecode">
 <h2>Input and output IDs</h2>
@@ -701,69 +723,21 @@ class C sout
 </div>
 </div>
 </section>
-<section id="another-example" class="slide level2">
-<h2>Another example</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(<span class="fu">selectInput</span>(<span class="st">"animal"</span>, <span class="st">"Choose your favourite animal"</span>, </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">choices =</span> <span class="fu">c</span>(<span class="st">""</span>,<span class="st">"Whale"</span>, <span class="st">"Dinosaur"</span>)),</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                <span class="fu">textOutput</span>(<span class="st">"animal_name"</span>))</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output) {</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>animal_name <span class="ot">&lt;-</span> <span class="fu">renderText</span>({</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    animal_names <span class="ot">=</span> <span class="fu">list</span>(<span class="st">"Whale"</span> <span class="ot">=</span> <span class="st">"Hope"</span>, <span class="st">"Dinosaur"</span> <span class="ot">=</span> <span class="st">"Dippy"</span>)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(<span class="st">"Your favourite animal's name is "</span>, animal_names[[input<span class="sc">$</span>animal]])})</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="columns">
-<div class="column" style="width:40%;">
-<div class="cell">
-<div class="cell-output-display">
-<br>
-</div>
-<div class="cell-output-display no-overflow-x">
-<div class="form-group shiny-input-container">
-<label class="control-label" id="animal-label" for="animal">Choose your favourite animal</label>
-<div>
-<select id="animal" class="shiny-input-select"><option value="" selected=""></option>
-<option value="Whale">Whale</option>
-<option value="Dinosaur">Dinosaur</option></select>
-<script type="application/json" data-for="animal">{"plugins":["selectize-plugin-a11y"]}</script>
-</div>
-</div>
-</div>
-</div>
-</div><div class="column" style="width:40%;">
-<div class="cell">
-<div class="cell-output-display">
-<br>
-</div>
-<div class="cell-output-display">
-<div id="animal_name" class="shiny-text-output"></div>
-</div>
-<div class="cell-output-display">
-<div id="animal_photo" class="shiny-html-output"></div>
-</div>
-</div>
-</div>
-</div>
-</section>
 <section id="shiny-input-widgets" class="slide level2">
 <h2>Shiny input widgets</h2>
 <div class="columns">
 <div class="column" style="width:30%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">actionButton</span>()</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">checkboxInput</span>()</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dateInput</span>()</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dateRangeInput</span>()</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">fileInput</span>()</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">numericInput</span>()</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">radioButtons</span>()</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">selectInput</span>()</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sliderInput</span>()</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">textInput</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">actionButton</span>()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">checkboxInput</span>()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dateInput</span>()</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dateRangeInput</span>()</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">fileInput</span>()</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">numericInput</span>()</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">radioButtons</span>()</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">selectInput</span>()</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sliderInput</span>()</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">textInput</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div><div class="column" style="width:70%;">
 <p><img data-src="images/basic-widgets.png" height="400"></p>
@@ -818,6 +792,54 @@ class C sout
 <li>This lets you write multiple lines of code, but only the last line is returned</li>
 </ul>
 </section>
+<section id="another-example" class="slide level2">
+<h2>Another example</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(<span class="fu">selectInput</span>(<span class="st">"animal"</span>, <span class="st">"Choose your favourite animal"</span>, </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">choices =</span> <span class="fu">c</span>(<span class="st">""</span>,<span class="st">"Whale"</span>, <span class="st">"Dinosaur"</span>)),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                <span class="fu">textOutput</span>(<span class="st">"animal_name"</span>))</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output) {</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>animal_name <span class="ot">&lt;-</span> <span class="fu">renderText</span>({</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    animal_names <span class="ot">=</span> <span class="fu">list</span>(<span class="st">"Whale"</span> <span class="ot">=</span> <span class="st">"Hope"</span>, <span class="st">"Dinosaur"</span> <span class="ot">=</span> <span class="st">"Dippy"</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(<span class="st">"Your favourite animal's name is "</span>, animal_names[[input<span class="sc">$</span>animal]])})</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="columns">
+<div class="column" style="width:40%;">
+<div class="cell">
+<div class="cell-output-display">
+<br>
+</div>
+<div class="cell-output-display no-overflow-x">
+<div class="form-group shiny-input-container">
+<label class="control-label" id="animal-label" for="animal">Choose your favourite animal</label>
+<div>
+<select id="animal" class="shiny-input-select"><option value="" selected=""></option>
+<option value="Whale">Whale</option>
+<option value="Dinosaur">Dinosaur</option></select>
+<script type="application/json" data-for="animal">{"plugins":["selectize-plugin-a11y"]}</script>
+</div>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:40%;">
+<div class="cell">
+<div class="cell-output-display">
+<br>
+</div>
+<div class="cell-output-display">
+<div id="animal_name" class="shiny-text-output"></div>
+</div>
+<div class="cell-output-display">
+<div id="animal_photo" class="shiny-html-output"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
 <section id="ui-development" class="slide level2 largecode">
 <h2>UI development</h2>
 <div class="columns">
@@ -865,7 +887,7 @@ class C sout
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>()</span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>output <span class="ot">&lt;-</span> <span class="fu">renderTable</span>({</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>table <span class="ot">&lt;-</span> <span class="fu">renderTable</span>({</span>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>()</span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  })</span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>}  </span>
@@ -886,7 +908,7 @@ class C sout
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>()</span>
 <span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># run whenever a new user uses the app</span></span>
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>output <span class="ot">&lt;-</span> <span class="fu">renderTable</span>({</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>table <span class="ot">&lt;-</span> <span class="fu">renderTable</span>({</span>
 <span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>()</span>
 <span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># run whenever input$value changes</span></span>
 <span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> df[df<span class="sc">$</span>column <span class="sc">==</span> input<span class="sc">$</span>value,]</span>
@@ -906,7 +928,7 @@ class C sout
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">numericInput</span>(<span class="st">"min"</span>, <span class="st">"Minimum"</span>, <span class="at">value =</span> <span class="dv">1</span>)</span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Server</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">reactive</span>(diamonds <span class="sc">%&gt;%</span> <span class="fu">filter</span>(input<span class="sc">$</span>var <span class="sc">&gt;</span> input<span class="sc">$</span>min))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>table <span class="ot">&lt;-</span> <span class="fu">renderTable</span>(diamonds <span class="sc">%&gt;%</span> <span class="fu">filter</span>(input<span class="sc">$</span>var <span class="sc">&gt;</span> input<span class="sc">$</span>min))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="tidyverse-peculiarities-1" class="slide level2">
@@ -915,14 +937,14 @@ class C sout
 <li>This is the correct syntax:</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">reactive</span>(diamonds <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.data[[input<span class="sc">$</span>var]] <span class="sc">&gt;</span> .env<span class="sc">$</span>input<span class="sc">$</span>min))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>table <span class="ot">&lt;-</span> <span class="fu">renderTable</span>(diamonds <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.data[[input<span class="sc">$</span>var]] <span class="sc">&gt;</span> .env<span class="sc">$</span>input<span class="sc">$</span>min))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>See <a href="https://mastering-shiny.org/action-tidy.html">Mastering Shiny</a> for more details</li>
 <li>For now, just use the old-fashioned method:</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">reactive</span>(diamonds[diamonds[[input<span class="sc">$</span>var]] <span class="sc">&gt;</span> input<span class="sc">$</span>min,])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>table <span class="ot">&lt;-</span> <span class="fu">renderTable</span>(diamonds[diamonds[[input<span class="sc">$</span>var]] <span class="sc">&gt;</span> input<span class="sc">$</span>min,])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="exercise-1" class="slide level2">
@@ -958,6 +980,9 @@ class C sout
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">reactive</span>(iris[iris<span class="sc">$</span>Species <span class="sc">==</span> input<span class="sc">$</span>species,])</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>min_petal_length <span class="ot">&lt;-</span> <span class="fu">min</span>(<span class="fu">df</span>()<span class="sc">$</span>Petal.Length)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<ul>
+<li>Just like the <code>render*</code> functions, you can make these multi-line using <code>{}</code></li>
+</ul>
 </section>
 <section id="file-uploads" class="slide level2 largecode">
 <h2>File uploads</h2>
@@ -1343,11 +1368,12 @@ class G sout
 <div class="cell">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>map <span class="ot">&lt;-</span> <span class="fu">renderLeaflet</span>({</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">leaflet</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">addPolygons</span>(<span class="at">data =</span> sf_object) <span class="sc">%&gt;%</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">addRasterImage</span>(raster_image) <span class="sc">%&gt;%</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">plet</span>(terra_object) <span class="co">#currently requires dev version: </span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                              <span class="co">#remotes::install_github("rstudio/leaflet")</span></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">addProviderTiles</span>(<span class="st">"Esri.WorldTopoMap"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">addPolygons</span>(<span class="at">data =</span> sf_object) <span class="sc">%&gt;%</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">addRasterImage</span>(raster_image) <span class="sc">%&gt;%</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">plet</span>(terra_object) <span class="co">#currently requires dev version: </span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>                              <span class="co">#remotes::install_github("rstudio/leaflet")</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="an-example" class="slide level2">
@@ -1367,7 +1393,7 @@ class G sout
 <li>legends - <code>addLegend()</code></li>
 <li>symbols - <code>addMarkers()</code></li>
 <li>pop-ups - <code>addPopups()</code></li>
-<li>zooming - <code>setView()</code></li>
+<li>zooming - <code>setView()</code> and <code>fitBounds()</code></li>
 <li>controlling visible layers- <code>addLayersControl()</code></li>
 </ul></li>
 <li><code>{leaflet.extras}</code> has tools for drawing shapes on the map which can be used to edit data</li>
@@ -1459,7 +1485,7 @@ class G sout
 <ul>
 <li>Use <code>{leaflet}</code> to select a ward or district of London and zoom when it is selected
 <ul>
-<li>Select the area either fully through clicking, or use a <code>selectInput()</code></li>
+<li>Select the area either through clicking, or use a <code>selectInput()</code></li>
 <li>Set the zoom using <code>sf::st_bbox()</code> and <code>leaflet::fitBounds()</code></li>
 </ul></li>
 <li>Use a <code>downloadHandler</code> to download a <code>.png</code> of the satellite imagery of just that area
@@ -1499,7 +1525,7 @@ class G sout
 </div><div class="column" style="width:50%;">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-70-1.png" width="960"></p>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-71-1.png" width="960"></p>
 </div>
 </div>
 </div>
@@ -1534,7 +1560,7 @@ class G sout
 </div><div class="column" style="width:70%;">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-72-1.png" width="960"></p>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-73-1.png" width="960"></p>
 </div>
 </div>
 </div>
@@ -1567,7 +1593,7 @@ class G sout
 </div><div class="column" style="width:50%;">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-74-1.png" width="960"></p>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-75-1.png" width="960"></p>
 </div>
 </div>
 </div>
@@ -1674,7 +1700,7 @@ class G sout
 <ul>
 <li>Name the file by the name of the ward/district</li>
 <li>Plot a histogram of the values of the ward</li>
-<li>A league table you of greenness where clicking on a row plots a shape</li>
+<li>A league table of greenness where clicking on a row zooms to the ward</li>
 <li>Anything else!</li>
 </ul></li>
 <li>Deploy the app to shinyapps.io (coming up!)</li>
@@ -1751,7 +1777,7 @@ class G sout
 <h2>Applications vs.&nbsp;scripts</h2>
 <ul>
 <li>Try and consider all the possible ways a user could interact with your app and manage them</li>
-<li>e.g what happens if you write this, but a user uploads a <code>.jpeg</code> instead of <code>.csv</code>?</li>
+<li>e.g.&nbsp;what happens if you write this, but a user uploads a <code>.jpeg</code> instead of <code>.csv</code>?</li>
 </ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fileInput</span>(<span class="st">"file"</span>, <span class="st">"Upload .csv file"</span>)</span>
@@ -1800,7 +1826,7 @@ class G sout
 <h2>Resources</h2>
 <ul>
 <li><a href="https://shiny.posit.co/r/getstarted/">Get started guide from Posit</a></li>
-<li><a href="https://shiny.posit.co/r/reference/shiny/1.0.5/">Function reference</a></li>
+<li><a href="https://shiny.posit.co/r/reference/shiny/1.0.5/">Shiny functions reference</a></li>
 <li><a href="https://mastering-shiny.org/">Mastering Shiny</a></li>
 <li><a href="https://unleash-shiny.rinterface.com/">Outstanding User Interfaces with Shiny</a></li>
 <li><a href="https://engineering-shiny.org/">Engineering Production-Grade Shiny Apps</a></li>
@@ -1904,8 +1930,8 @@ output$selected_row <- renderText({glue::glue("You have selected rows: {paste(in
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
-fcover <- terra::rast("exercise3/london_fcover.tif")
-wards <- sf::st_read("exercise3/London_Ward.shp")
+fcover <- terra::rast("exercise3/London_fcover_2023-06-10.tif")
+wards <- sf::st_read("exercise3/London_Ward.shp", quiet = TRUE)
 
 #reproject shapes to same CRS as the raster
 wards <- sf::st_transform(wards, terra::crs(fcover))
@@ -1923,8 +1949,8 @@ pal <- leaflet::colorBin("Greens", domain = c(0:100), na.color = "#00000000")
 
 output$map2 <- leaflet::renderLeaflet({
               leaflet::leaflet() %>%
-              leaflet::addProviderTiles("Esri.WorldTopoMap") %>%
-              leaflet::addRasterImage(terra::clamp(fcover, input$thresh1, value=FALSE), colors = pal) %>%
+              leaflet::addProviderTiles("Esri.WorldImagery") %>%
+              leaflet::addRasterImage(terra::clamp(fcover, input$thresh1, value=FALSE), colors = pal, opacity = 0.7) %>%
               leaflet::addPolygons(data = wards, color = "black", weight = 1) %>%
               leaflet::addLegend(position = "bottomright", pal = pal, values = terra::values(fcover), title = "FCover")
               })
@@ -1933,7 +1959,7 @@ output$map2 <- leaflet::renderLeaflet({
 <script type="application/shiny-prerendered" data-context="server">
 output$map3 <- leaflet::renderLeaflet({
               leaflet::leaflet() %>%
-              leaflet::addProviderTiles("Esri.WorldTopoMap") %>%
+              leaflet::addProviderTiles("Esri.WorldImagery") %>%
               leaflet::addPolygons(data = wards, color = "black", weight = 1) %>%
               leaflet::addLegend(position = "bottomright", pal = pal, values = terra::values(fcover), title = "FCover")
               })
@@ -1943,18 +1969,8 @@ proxy_map <- leaflet::leafletProxy("map3")
 observe({
   req(!is.na(input$thresh2))
   proxy_map %>%
-    leaflet::addRasterImage(terra::clamp(fcover, input$thresh2 , value = FALSE), colors = pal) 
+    leaflet::addRasterImage(terra::clamp(fcover, input$thresh2 , value = FALSE), colors = pal, opacity = 0.7) 
 })
-
-output$selected_shape <- renderText({
-  selected_point <- data.frame(x = input$map3_shape_click$lng, y = input$map3_shape_click$lat ) %>% 
-                     sf::st_as_sf(coords = c("x", "y"), crs = 4326) 
-
-index_of_polygon <- sf::st_intersects(selected_point, wards, sparse = T) %>% 
-                    as.numeric()
-
-glue::glue("You clicked on the ward of {wards$NAME[index_of_polygon]} which is in {wards$DISTRICT[index_of_polygon]}")
-  })
 
 </script>
  
